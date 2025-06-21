@@ -38,6 +38,20 @@ jobs:
         brew update
         brew install sfml
 
+    # Download and extract SFML for Windows
+    - name: Download SFML (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        curl -L -o sfml.zip https://www.sfml-dev.org/files/SFML-2.6.1-windows-vc15-64-bit.zip
+        unzip sfml.zip -d ${{ github.workspace }}/sfml
+      shell: bash
+
+    # Set SFML_DIR for Windows
+    - name: Set SFML_DIR (Windows)
+      if: runner.os == 'Windows'
+      run: echo "SFML_DIR=${{ github.workspace }}/sfml/SFML-2.6.1/lib/cmake/SFML" >> $GITHUB_ENV
+      shell: bash
+
     # Checkout code
     - name: Checkout
       uses: actions/checkout@v4
@@ -45,6 +59,8 @@ jobs:
     # Configure CMake for the current platform and configuration
     - name: Configure
       run: cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }}
+      env:
+        SFML_DIR: ${{ env.SFML_DIR }}
 
     # Build the project
     - name: Build
