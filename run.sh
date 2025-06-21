@@ -10,8 +10,8 @@ mkdir -p build
 cd build
 
 # Configure and build
-cmake .. > /dev/null
-make > /dev/null
+cmake ..
+make
 
 # Verify binary exists
 if [[ ! -f ./bin/main ]]; then

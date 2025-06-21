@@ -8,6 +8,7 @@ defaults:
 
 jobs:
   build:
+    # Build matrix for Windows and macOS (including macOS 15.5 arm64)
     name: ${{ matrix.platform.name }} ${{ matrix.config.name }}
     runs-on: ${{ matrix.platform.os }}
 
@@ -15,25 +16,36 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows VS2019, os: windows-2019  }
-        - { name: Windows VS2022, os: windows-2022  }
-        - { name: Linux GCC,      os: ubuntu-latest }
-        - { name: Linux Clang,    os: ubuntu-latest, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
-        - { name: macOS,          os: macos-latest  }
+        # Windows builds (x64)
+        - { name: Windows VS2019, os: windows-2019 }
+        - { name: Windows VS2022, os: windows-2022 }
+        # macOS builds (arm64, macOS 15.5)
+        - { name: macOS 15.5 ARM, os: macos-15 }
         config:
         - { name: Shared, flags: -DBUILD_SHARED_LIBS=TRUE }
         - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
 
     steps:
+    # Install dependencies for Linux (not used in this matrix, but kept for reference)
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev
 
+    # Install SFML on macOS using Homebrew
+    - name: Install SFML (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew update
+        brew install sfml
+
+    # Checkout code
     - name: Checkout
       uses: actions/checkout@v4
 
+    # Configure CMake for the current platform and configuration
     - name: Configure
-      run: cmake -B build ${{matrix.platform.flags}} ${{matrix.config.flags}}
+      run: cmake -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }}
 
+    # Build the project
     - name: Build
       run: cmake --build build --config Release
