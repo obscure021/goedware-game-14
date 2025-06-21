@@ -39,11 +39,11 @@ jobs:
         brew install sfml
 
     # Download and extract SFML for Windows
-    - name: Download SFML (Windows)
+    - name: Download and Extract SFML (Windows)
       if: runner.os == 'Windows'
       run: |
         curl -L -o sfml.zip https://www.sfml-dev.org/files/SFML-2.6.1-windows-vc15-64-bit.zip
-        unzip sfml.zip -d ${{ github.workspace }}/sfml
+        powershell -Command "Expand-Archive -Path sfml.zip -DestinationPath '${{ github.workspace }}\sfml'"
       shell: bash
 
     # Set SFML_DIR for Windows
