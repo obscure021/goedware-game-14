@@ -1,17 +1,19 @@
 cmake_minimum_required(VERSION 3.28)
-project(CMakeSFMLProject LANGUAGES CXX)
+project(CMakeSFML3 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include(FetchContent)
-FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 3.0.1
-    GIT_SHALLOW ON
-    EXCLUDE_FROM_ALL
-    SYSTEM)
-FetchContent_MakeAvailable(SFML)
+# Let CMake find SFML 3 from system paths (e.g., Homebrew-installed)
+find_package(SFML 3 COMPONENTS Window Graphics Audio System REQUIRED)
 
-add_executable(main src/main.cpp)
-target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics)
+add_executable(main main.cpp)
+
+# Link to SFML 3 imported targets
+target_link_libraries(main PRIVATE
+    SFML::Window
+    SFML::Graphics
+    SFML::Audio
+    SFML::System
+)
