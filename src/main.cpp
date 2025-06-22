@@ -1,13 +1,16 @@
 #include "Scene.hpp"
+#include "objects/PlayerObject.hpp"
 #include <iostream>
 
 int main()
 {
-    Scene app(800, 600, "SFML Class-Based Rendering");
+    Scene app(800, 600, "Game");
 
-    auto obj1 = std::make_shared<Object>("name1", "assets/bg.jpg", 0, 0);
-    auto obj2 = std::make_shared<Object>("name1", "assets/sprite1.png", 5, 5);
+    auto obj1 = std::make_shared<Object>("background", "assets/bg.jpg", 0, 0);
+    auto player = std::make_shared<PlayerObject>();
+
     app.addObject(obj1);
-    app.addObject(obj2);
+    app.addObject(player);
+
     app.run();
 }

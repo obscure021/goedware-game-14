@@ -13,8 +13,12 @@ add_executable(main
     src/main.cpp
     src/classes/Scene.cpp
     src/classes/Object.cpp
+    src/classes/objects/PlayerObject.cpp
     src/classes/utils/Helpers.cpp
+    ${SOURCES}
 )
+
+
 target_include_directories(main PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/classes

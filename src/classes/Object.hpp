@@ -5,18 +5,28 @@
 #include <optional>
 #include <string>
 
+class Scene;
+
 class Object
 {
 public:
-    Object(const std::string& name, const std::string& texturePath, float x, float y);
+    Object(const std::string &name, const std::string &texturePath, float x, float y);
 
-    void setName(const std::string& name);
+    void setName(const std::string &name);
     std::string getName() const;
 
     void setPosition(float x, float y);
     sf::Vector2f getPosition() const;
 
-    void draw(sf::RenderWindow& window) const;
+    void setScene(Scene *sceneRef);
+
+    void draw(sf::RenderWindow &window) const;
+    virtual void update(float deltaTime);
+
+protected:
+    Scene *scene = nullptr;
+
+    virtual void subscribeToEvents();
 
 private:
     std::string name;
