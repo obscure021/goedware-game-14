@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 #include "Object.hpp"
+#include "objects/PlayerObject.hpp"
 #include "utils/Helpers.cpp"
 
 class Scene
@@ -14,19 +15,25 @@ class Scene
 public:
     Scene(unsigned int width, unsigned int height, const std::string &title);
 
-    void addObject(std::shared_ptr<Object> object);
-    void removeObject(std::shared_ptr<Object> object);
-
     gameUtils::Event<sf::Keyboard::Scan> onKeyPressed;
     const std::unordered_set<sf::Keyboard::Scan> &getHeldKeys() const;
     bool isKeyPressed(sf::Keyboard::Scan keyScan);
 
-    void run(); // Main loop
+    gameUtils::Event<sf::Vector2u> onResize;
+    sf::RenderWindow& getWindow();
+    
+    void addObject(std::shared_ptr<Object> object);
+    void removeObject(std::shared_ptr<Object> object);
+    
+    void initalize();
     void stop();
 
+    std::shared_ptr<PlayerObject> getPlayer();
+
 private:
-    void processEvents();
     float getDeltaTime();
+
+    void processEvents();
     void update();
     void render();
 

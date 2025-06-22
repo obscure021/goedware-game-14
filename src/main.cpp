@@ -12,5 +12,5 @@ int main()
     app.addObject(obj1);
     app.addObject(player);
 
-    app.run();
+    app.initalize();
 }

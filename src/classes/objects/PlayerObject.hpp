@@ -11,13 +11,15 @@ class PlayerObject : public Object, public std::enable_shared_from_this<PlayerOb
 public:
     PlayerObject();
 
+    sf::Vector2f movementVector;
+
     void update(float deltaTime) override;
 
 protected:
-    void subscribeToEvents() override;
+    void afterSceneInit() override;
 
 private:
-    void move(sf::Vector2f movementVector, float deltaTime);
+    void move(sf::Vector2f direction, float deltaTime, float speed = 0);
 };
 
 #endif

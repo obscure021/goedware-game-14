@@ -7,40 +7,49 @@ PlayerObject::PlayerObject()
 {
 }
 
-void PlayerObject::subscribeToEvents()
+void PlayerObject::afterSceneInit()
 {
+    if (scene)
+    {
+        sf::Vector2u windowSize = scene->getWindow().getSize();
+        setPosition(static_cast<float>(windowSize.x) / 2.f, static_cast<float>(windowSize.y) / 2.f);
+    }
+
     auto self = shared_from_this();
-    scene->onKeyPressed.subscribe([self](auto keyScan)
-                                  {
-        if (keyScan == sf::Keyboard::Scan::Space)
-        {
-            gameUtils::debugPrint("Space pressed");
-        } });
+    // scene->onKeyPressed.subscribe([self](auto keyScan) { // self to allow accessing members of PlayerObject
+    //     if (keyScan == sf::Keyboard::Scan::Space)
+    //     {
+    //         gameUtils::debugPrint("Space pressed");
+    //     }
+    // });
+    scene->onResize.subscribe([&](sf::Vector2u newSize)
+                              { setPosition(static_cast<float>(newSize.x) / 2.f, static_cast<float>(newSize.y) / 2.f); });
 }
 
 void PlayerObject::update(float dt)
 {
+    sf::Vector2f direction{0.f, 0.f};
+
     if (scene->isKeyPressed(sf::Keyboard::Scan::W))
-    {
-        move({0, -100}, dt);
-    }
+        direction.y += 1.f;
     if (scene->isKeyPressed(sf::Keyboard::Scan::S))
-    {
-        move({0, 100}, dt);
-    }
+        direction.y -= 1.f;
     if (scene->isKeyPressed(sf::Keyboard::Scan::A))
-    {
-        move({-100, 0}, dt);
-    }
+        direction.x += 1.f;
     if (scene->isKeyPressed(sf::Keyboard::Scan::D))
+        direction.x -= 1.f;
+
+    if (direction != sf::Vector2f{0.f, 0.f})
     {
-        move({100, 0}, dt);
+        move(gameUtils::normalizeVector2f(direction), dt, 100.f);
+    }
+    else
+    {
+        move({0.f, 0.f}, dt, 0.f);
     }
 }
 
-void PlayerObject::move(sf::Vector2f movementVector, float deltaTime)
+void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)
 {
-    auto pos = getPosition();
-    pos += movementVector * deltaTime;
-    setPosition(pos.x, pos.y);
+    this->movementVector = gameUtils::normalizeVector2f(direction) * speed * deltaTime;
 }

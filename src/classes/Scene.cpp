@@ -10,6 +10,11 @@ Scene::Scene(unsigned int width, unsigned int height, const std::string &title)
     window.setFramerateLimit(60);
 }
 
+sf::RenderWindow& Scene::getWindow()
+{
+    return window;
+}
+
 void Scene::addObject(std::shared_ptr<Object> object)
 {
     try
@@ -35,7 +40,7 @@ float Scene::getDeltaTime()
     return deltaClock.restart().asSeconds(); // Returns elapsed time and restarts the clock
 }
 
-void Scene::run()
+void Scene::initalize()
 {
     while (window.isOpen())
     {
@@ -56,6 +61,7 @@ void Scene::processEvents()
             // update the view to the new size of the window
             sf::FloatRect visibleArea({0.f, 0.f}, sf::Vector2f(resized->size));
             window.setView(sf::View(visibleArea));
+            onResize.fire(resized->size);
         }
         else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
         {
@@ -71,12 +77,27 @@ void Scene::processEvents()
 
 void Scene::update()
 {
+    // OBJECTS UPDATE
     float deltaTime = getDeltaTime(); // Get time between frames
 
-    // Update each object with deltaTime to make movement frame-rate independent
     for (const auto &obj : objects)
     {
         obj->update(deltaTime); // Pass delta time to each object's update method
+    }
+
+    // LOGIC
+    // player movement (move the entire scene instead of player)
+    auto player = getPlayer();
+    if (player)
+    {
+        sf::Vector2f movementVector = player->movementVector;
+        for (const auto &obj : objects)
+        {
+            if (obj->getName() == "Player")
+                continue;
+
+            obj->move(movementVector);
+        }
     }
 }
 
@@ -102,5 +123,20 @@ const std::unordered_set<sf::Keyboard::Scan> &Scene::getHeldKeys() const
 
 bool Scene::isKeyPressed(sf::Keyboard::Scan keyScan)
 {
-    return heldKeys.count(keyScan);
+    return heldKeys.count(keyScan); // count returns 0 when no key held
+}
+
+std::shared_ptr<PlayerObject> Scene::getPlayer()
+{
+    for (const auto &obj : objects)
+    {
+        // Try to cast to PlayerObject
+        std::shared_ptr<PlayerObject> player = std::dynamic_pointer_cast<PlayerObject>(obj);
+        if (player)
+        {
+            return player; // Found and cast successful
+        }
+    }
+
+    return nullptr; // Not found
 }
