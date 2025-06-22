@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   build:
-    # Build matrix for Windows and macOS (including macOS 15.5 arm64)
+    # Build matrix for macOS 15.5 ARM
     name: ${{ matrix.platform.name }} ${{ matrix.config.name }}
     runs-on: ${{ matrix.platform.os }}
 
@@ -16,9 +16,6 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        # Windows builds (x64)
-        - { name: Windows VS2019, os: windows-2019 }
-        - { name: Windows VS2022, os: windows-2022 }
         # macOS builds (arm64, macOS 15.5)
         - { name: macOS 15.5 ARM, os: macos-15 }
         config:
@@ -26,31 +23,12 @@ jobs:
         - { name: Static, flags: -DBUILD_SHARED_LIBS=FALSE }
 
     steps:
-    # Install dependencies for Linux (not used in this matrix, but kept for reference)
-    - name: Install Linux Dependencies
-      if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev
-
     # Install SFML on macOS using Homebrew
     - name: Install SFML (macOS)
       if: runner.os == 'macOS'
       run: |
         brew update
         brew install sfml
-
-    # Download and extract SFML for Windows
-    - name: Download and Extract SFML (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        curl -L -o sfml.zip https://www.sfml-dev.org/files/SFML-2.6.1-windows-vc15-64-bit.zip
-        powershell -Command "Expand-Archive -Path sfml.zip -DestinationPath '${{ github.workspace }}\sfml'"
-      shell: bash
-
-    # Set SFML_DIR for Windows
-    - name: Set SFML_DIR (Windows)
-      if: runner.os == 'Windows'
-      run: echo "SFML_DIR=${{ github.workspace }}/sfml/SFML-2.6.1/lib/cmake/SFML" >> $GITHUB_ENV
-      shell: bash
 
     # Checkout code
     - name: Checkout
