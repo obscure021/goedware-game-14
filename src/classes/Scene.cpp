@@ -4,8 +4,9 @@
 #include <algorithm>
 #include <iostream>
 
-Scene::Scene(unsigned int width, unsigned int height, const std::string &title)
-    : window(sf::VideoMode({width, height}), title)
+
+Scene::Scene(sf::Vector2u windowSize, const std::string &title, sf::Vector2f origin)
+    : window(sf::VideoMode({windowSize.x, windowSize.y}), title), origin(origin)
 {
     window.setFramerateLimit(60);
 }
@@ -139,4 +140,9 @@ std::shared_ptr<PlayerObject> Scene::getPlayer()
     }
 
     return nullptr; // Not found
+}
+
+sf::Vector2f Scene::getOrigin()
+{
+    return origin;
 }

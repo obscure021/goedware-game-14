@@ -9,8 +9,8 @@ Object::Object(const std::string &name, const std::string &texturePath, float x,
     if (!texture.loadFromFile(texturePath))
         throw std::runtime_error("Failed to load texture: " + texturePath);
 
-    sprite.emplace(texture);                 // Initialize sprite with texture
-    sprite->setPosition(sf::Vector2f{x, y}); // Set initial position
+    sprite.emplace(texture); // Initialize sprite with texture
+    sprite->setPosition(sf::Vector2f{x, y});
 
     sf::FloatRect bounds = sprite->getLocalBounds();
 
@@ -28,16 +28,15 @@ std::string Object::getName() const
     return name;
 }
 
-void Object::setPosition(float x, float y)
-{
-    if (sprite)
-        sprite->setPosition({x, y});
-}
-
 void Object::setPosition(sf::Vector2f positionVector)
 {
     if (sprite)
         sprite->setPosition(positionVector);
+}
+
+void Object::setPosition(float x, float y)
+{
+    setPosition({x, y});
 }
 
 void Object::setOrigin(float x, float y)
@@ -69,6 +68,7 @@ void Object::move(sf::Vector2f movementVector)
 void Object::setScene(Scene *sceneRef)
 {
     scene = sceneRef;
+    sceneInitEvent.fire();
     afterSceneInit();
 }
 
@@ -84,4 +84,8 @@ void Object::update(float deltaTime)
 
 void Object::afterSceneInit()
 {
+    if (sprite && scene)
+    {
+        sprite->move(scene->getOrigin()); // Offset once after scene init
+    }
 }

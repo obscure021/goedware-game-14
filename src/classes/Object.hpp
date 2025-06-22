@@ -1,6 +1,8 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 
+#include "utils/Helpers.cpp"
+
 #include <SFML/Graphics.hpp>
 #include <optional>
 #include <string>
@@ -39,6 +41,8 @@ private:
     std::string name;
     sf::Texture texture;
     std::optional<sf::Sprite> sprite; // Sprite is optional
+
+    gameUtils::Event<> sceneInitEvent;
 };
 
 #endif

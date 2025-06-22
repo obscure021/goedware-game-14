@@ -13,7 +13,7 @@
 class Scene
 {
 public:
-    Scene(unsigned int width, unsigned int height, const std::string &title);
+    Scene(sf::Vector2u size, const std::string &title, sf::Vector2f origin = {0.f, 0.f});
 
     gameUtils::Event<sf::Keyboard::Scan> onKeyPressed;
     const std::unordered_set<sf::Keyboard::Scan> &getHeldKeys() const;
@@ -29,6 +29,7 @@ public:
     void stop();
 
     std::shared_ptr<PlayerObject> getPlayer();
+    sf::Vector2f getOrigin();
 
 private:
     float getDeltaTime();
@@ -43,6 +44,7 @@ private:
     std::unordered_set<sf::Keyboard::Scan> heldKeys;
 
     sf::Clock deltaClock; // Clock to measure time between frames
+    sf::Vector2f origin;
 };
 
 #endif
