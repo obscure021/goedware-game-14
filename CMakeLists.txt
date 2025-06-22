@@ -8,7 +8,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Let CMake find SFML 3 from system paths (e.g., Homebrew-installed)
 find_package(SFML 3 COMPONENTS Window Graphics Audio System REQUIRED)
 
-add_executable(main main.cpp)
+
+add_executable(main
+    src/main.cpp
+    src/classes/Scene.cpp
+    src/classes/Object.cpp
+    src/classes/utils/Helpers.cpp
+)
+target_include_directories(main PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/classes
+    )
 
 # Link to SFML 3 imported targets
 target_link_libraries(main PRIVATE
@@ -16,4 +26,11 @@ target_link_libraries(main PRIVATE
     SFML::Graphics
     SFML::Audio
     SFML::System
+)
+
+add_custom_command(
+    TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets
+    ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
