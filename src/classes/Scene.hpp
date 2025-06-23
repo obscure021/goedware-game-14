@@ -10,7 +10,7 @@
 #include "objects/PlayerObject.hpp"
 #include "utils/Helpers.cpp"
 
-class Scene
+class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
     Scene(sf::Vector2u size, const std::string &title, sf::Vector2f origin = {0.f, 0.f});
@@ -28,7 +28,10 @@ public:
     void initalize();
     void stop();
 
+    gameUtils::Event<> sceneInitEvent;
+
     std::shared_ptr<PlayerObject> getPlayer();
+    const std::vector<std::shared_ptr<Object>>& getAllObjects() const;
     sf::Vector2f getOrigin();
 
 private:

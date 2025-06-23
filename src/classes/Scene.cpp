@@ -21,7 +21,7 @@ void Scene::addObject(std::shared_ptr<Object> object)
     try
     {
         objects.push_back(object);
-        object->setScene(this);
+        object->connectToScene(shared_from_this());
         gameUtils::debugPrint("Added [Object] " + object->getName() + " succesfully.");
     }
     catch (const std::exception &e)
@@ -43,6 +43,7 @@ float Scene::getDeltaTime()
 
 void Scene::initalize()
 {
+    sceneInitEvent.fire();
     while (window.isOpen())
     {
         processEvents();
@@ -140,6 +141,11 @@ std::shared_ptr<PlayerObject> Scene::getPlayer()
     }
 
     return nullptr; // Not found
+}
+
+const std::vector<std::shared_ptr<Object>> &Scene::getAllObjects() const
+{
+    return objects;
 }
 
 sf::Vector2f Scene::getOrigin()

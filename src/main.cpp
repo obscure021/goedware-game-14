@@ -9,18 +9,24 @@ int main()
     const unsigned int WINDOW_WIDTH = 600;
     const sf::Vector2f ORIGIN = {WINDOW_HEIGHT / 2, WINDOW_WIDTH / 2};
 
-    Scene app({WINDOW_HEIGHT, WINDOW_WIDTH}, "Game", ORIGIN);
+    // Scene sceneA({WINDOW_HEIGHT, WINDOW_WIDTH}, "Game", ORIGIN);
+    sf::Vector2u windowSize(WINDOW_HEIGHT, WINDOW_WIDTH);
 
-    auto background = std::make_shared<Object>("background", "assets/bg.jpg", 0, 0);
+    std::shared_ptr<Scene> sceneA = std::make_shared<Scene>(windowSize, "Game", ORIGIN);
+
+    auto background = std::make_shared<Object>("background", "assets/bg.jpg", sf::Vector2f({0, 0}));
     auto player = std::make_shared<PlayerObject>();
-    
-    auto boxA = std::make_shared<InteractableObject>("boxA", "assets/box.png", 100, 0);
 
-    app.addObject(background);
-    app.addObject(player);
+    std::unordered_map<std::string, int> comp = {
+        {"nitrogen", 5},
+        {"oxygen", 2}};
+    auto boxA = std::make_shared<InteractableObject>("boxA", "assets/box.png", sf::Vector2f({100, 0}), comp);
+    auto boxB = std::make_shared<InteractableObject>("boxB", "assets/box.png", sf::Vector2f({120, 0}), comp);
 
-    app.addObject(boxA);
+    sceneA->addObject(background);
+    sceneA->addObject(player);
+    sceneA->addObject(boxA);
+    sceneA->addObject(boxB);
 
-
-    app.initalize();
+    sceneA->initalize();
 }

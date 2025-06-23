@@ -2,8 +2,8 @@
 #include "Scene.hpp"
 
 
-InteractableObject::InteractableObject(const std::string &name, const std::string &texturePath, float x, float y)
-    : Object(name, texturePath, x, y)
+InteractableObject::InteractableObject(const std::string &name, const std::string &texturePath, const sf::Vector2f position, const std::unordered_map<std::string, int> composition)
+    : Object(name, texturePath, position), composition(composition)
 {
 }
 
@@ -12,7 +12,6 @@ void InteractableObject::update(float deltaTime) {
 
     sf::Vector2f playerPos = playerRef->getPosition();
     distanceFromPlayer = (getPosition() - playerPos).length();
-    gameUtils::debugPrint(std::to_string( distanceFromPlayer));
 }
 
 void InteractableObject::afterSceneInit() {
@@ -38,4 +37,9 @@ void InteractableObject::afterSceneInit() {
 
 void InteractableObject::interact()
 {
+}
+
+gameStructs::Item InteractableObject::asItem()
+{
+    return gameStructs::Item(name, composition);
 }

@@ -1,27 +1,48 @@
 #include "PlayerObject.hpp"
 #include "Scene.hpp"
 #include "utils/Helpers.cpp"
+#include "objects/InteractableObject.hpp"
 
 PlayerObject::PlayerObject()
-    : Object("Player", "assets/player.png", 0, 0)
+    : Object("Player", "assets/player.png", {0, 0})
 {
 }
 
 void PlayerObject::afterSceneInit()
 {
-    if (scene)
+    sf::Vector2u windowSize = scene->getWindow().getSize();
+    setPosition(static_cast<float>(windowSize.x) / 2.f, static_cast<float>(windowSize.y) / 2.f);
+
+    // setup interactable objects
+    for (const auto &obj : scene->getAllObjects())
     {
-        sf::Vector2u windowSize = scene->getWindow().getSize();
-        setPosition(static_cast<float>(windowSize.x) / 2.f, static_cast<float>(windowSize.y) / 2.f);
+        auto interactable = std::dynamic_pointer_cast<InteractableObject>(obj);
+        if (interactable)
+        {
+            interactableObjectsInScene.push_back(interactable); // store as weak_ptr
+        }
     }
 
-    auto self = shared_from_this();
-    // scene->onKeyPressed.subscribe([self](auto keyScan) { // self to allow accessing members of PlayerObject
-    //     if (keyScan == sf::Keyboard::Scan::Space)
-    //     {
-    //         gameUtils::debugPrint("Space pressed");
-    //     }
-    // });
+    // cast to use shared_from_this of Object
+    std::shared_ptr<PlayerObject> self = std::dynamic_pointer_cast<PlayerObject>(shared_from_this());
+    scene->onKeyPressed.subscribe([self](auto keyScan) { // self to allow accessing members of PlayerObject
+        if (keyScan == sf::Keyboard::Scan::Space)
+        {
+            for (const auto &weakInteractable : self->interactableObjectsInScene)
+            {
+                if (auto interactable = weakInteractable.lock())
+                {
+                    if (interactable->distanceFromPlayer < 50.f) // example threshold
+                    {
+                        gameUtils::debugPrint("Interacting with: " + interactable->getName());
+                        self->addToHeldItem(interactable->asItem());
+                        break; // interact with one object only
+                    }
+                }
+            }
+        }
+    });
+
     scene->onResize.subscribe([&](sf::Vector2u newSize)
                               { setPosition(static_cast<float>(newSize.x) / 2.f, static_cast<float>(newSize.y) / 2.f); });
 }
@@ -47,6 +68,12 @@ void PlayerObject::update(float dt)
     {
         move({0.f, 0.f}, dt, 0.f);
     }
+}
+
+void PlayerObject::addToHeldItem(gameStructs::Item item)
+{
+    gameUtils::debugPrint("Add To Held Item: " + item.ToString());
+    heldItemsList.push_back(item);
 }
 
 void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)

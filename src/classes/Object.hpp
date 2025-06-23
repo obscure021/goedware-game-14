@@ -9,10 +9,10 @@
 
 class Scene;
 
-class Object
+class Object : public std::enable_shared_from_this<Object>
 {
 public:
-    Object(const std::string &name, const std::string &texturePath, float x, float y);
+    Object(const std::string &name, const std::string &texturePath, const sf::Vector2f position);
     virtual ~Object() = default; // Required for dynamic cast
 
     void setName(const std::string &name);
@@ -23,25 +23,27 @@ public:
 
     void setOrigin(float x, float y);
     void setOrigin(sf::Vector2f positionVector);
-    
+
     sf::Vector2f getPosition() const;
     void move(sf::Vector2f movementVector);
 
-    void setScene(Scene *sceneRef);
+    void connectToScene(std::shared_ptr<Scene> sceneRef);
+    void destroySelf();
 
     void draw(sf::RenderWindow &window) const;
     virtual void update(float deltaTime);
 
 protected:
-    Scene *scene = nullptr;
+    std::string name;
 
+    std::shared_ptr<Scene> scene;
     virtual void afterSceneInit();
 
 private:
-    std::string name;
     sf::Texture texture;
     std::optional<sf::Sprite> sprite; // Sprite is optional
 
+    std::weak_ptr<Scene> sceneWeak;
     gameUtils::Event<> sceneInitEvent;
 };
 

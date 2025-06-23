@@ -3,14 +3,14 @@
 #include "Object.hpp"
 #include "Scene.hpp"
 
-Object::Object(const std::string &name, const std::string &texturePath, float x, float y)
+Object::Object(const std::string &name, const std::string &texturePath, const sf::Vector2f position)
     : name(name)
 {
     if (!texture.loadFromFile(texturePath))
         throw std::runtime_error("Failed to load texture: " + texturePath);
 
     sprite.emplace(texture); // Initialize sprite with texture
-    sprite->setPosition(sf::Vector2f{x, y});
+    sprite->setPosition(position);
 
     sf::FloatRect bounds = sprite->getLocalBounds();
 
@@ -65,11 +65,30 @@ void Object::move(sf::Vector2f movementVector)
     setPosition(pos);
 }
 
-void Object::setScene(Scene *sceneRef)
+void Object::connectToScene(std::shared_ptr<Scene> sceneRef)
 {
-    scene = sceneRef;
+    sceneWeak = sceneRef; // Assign weak_ptr
+
+    // Immediately fire internal scene init event
     sceneInitEvent.fire();
-    afterSceneInit();
+
+    if (sceneRef)
+    {
+        // Subscribe to scene's init event
+        sceneRef->sceneInitEvent.subscribe([weakThis = weak_from_this()]()
+                                           {
+            if (auto sharedThis = weakThis.lock())
+            {
+                sharedThis->afterSceneInit(); // Safe access
+            } });
+    }
+
+    scene = sceneWeak.lock();
+}
+
+void Object::destroySelf()
+{
+    scene->removeObject(shared_from_this());
 }
 
 void Object::draw(sf::RenderWindow &window) const
@@ -84,8 +103,8 @@ void Object::update(float deltaTime)
 
 void Object::afterSceneInit()
 {
-    if (sprite && scene)
-    {
-        sprite->move(scene->getOrigin()); // Offset once after scene init
-    }
+    if (!sprite || !scene)
+        return;
+
+    sprite->move(scene->getOrigin()); // Offset once after scene init
 }
