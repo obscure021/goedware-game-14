@@ -37,6 +37,7 @@ void InteractableObject::afterSceneInit() {
 
 void InteractableObject::interact()
 {
+    destroySelf();
 }
 
 gameStructs::Item InteractableObject::asItem()

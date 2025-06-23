@@ -4,14 +4,13 @@
 #include <algorithm>
 #include <iostream>
 
-
 Scene::Scene(sf::Vector2u windowSize, const std::string &title, sf::Vector2f origin)
     : window(sf::VideoMode({windowSize.x, windowSize.y}), title), origin(origin)
 {
     window.setFramerateLimit(60);
 }
 
-sf::RenderWindow& Scene::getWindow()
+sf::RenderWindow &Scene::getWindow()
 {
     return window;
 }
@@ -33,7 +32,16 @@ void Scene::addObject(std::shared_ptr<Object> object)
 
 void Scene::removeObject(std::shared_ptr<Object> object)
 {
-    gameUtils::debugPrint("WIP");
+    auto it = std::remove(objects.begin(), objects.end(), object);
+    if (it != objects.end())
+    {
+        gameUtils::debugPrint("Removed [Object] " + object->getName() + " successfully.");
+        objects.erase(it, objects.end());
+    }
+    else
+    {
+        gameUtils::debugPrint("Attempted to remove [Object] " + object->getName() + " but it was not found.");
+    }
 }
 
 float Scene::getDeltaTime()

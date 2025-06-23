@@ -36,6 +36,18 @@ void PlayerObject::afterSceneInit()
                     {
                         gameUtils::debugPrint("Interacting with: " + interactable->getName());
                         self->addToHeldItem(interactable->asItem());
+                        interactable->interact(); // removes from scene
+
+                        // remove from the list of interactable objects
+                        for (auto it = self->interactableObjectsInScene.begin(); it != self->interactableObjectsInScene.end(); ++it)
+                        {
+                            if (it->lock() == interactable)
+                            {
+                                self->interactableObjectsInScene.erase(it);
+                                break; // done
+                            }
+                        }
+
                         break; // interact with one object only
                     }
                 }
