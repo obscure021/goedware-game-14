@@ -33,6 +33,20 @@ namespace gameStructs
         }
     };
 
+    struct ElementMole
+    {
+        std::string name;
+        int numOfMoles;
+
+        ElementMole(std::string name, int moles) : name(name), numOfMoles(moles)
+        {
+        }
+
+        inline std::string ToString() const {
+            return name + ": " + std::to_string(numOfMoles);
+        }
+    };
+
 } // namespace gameStructs
 
 #endif

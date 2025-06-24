@@ -6,6 +6,9 @@
 #include <vector>
 #include <functional>
 
+#include "utils/Structs.hpp"
+
+
 namespace gameUtils
 {
     inline void debugPrint(const std::string &str) // Use const-ref for efficiency
@@ -27,6 +30,29 @@ namespace gameUtils
 
         float invMag = 1.0f / std::sqrt(magSq);
         return {vector.x * invMag, vector.y * invMag};
+    }
+
+    // Convert map → vector
+    inline std::vector<gameStructs::ElementMole> MapToElementVector(const std::unordered_map<std::string, int>& sourceMap)
+    {
+        std::vector<gameStructs::ElementMole> result;
+        result.reserve(sourceMap.size());
+        for (const auto& [name, moles] : sourceMap)
+        {
+            result.emplace_back(name, moles);
+        }
+        return result;
+    }
+
+    // Convert vector → map
+    inline std::unordered_map<std::string, int> ElementVectorToMap(const std::vector<gameStructs::ElementMole>& sourceVec)
+    {
+        std::unordered_map<std::string, int> result;
+        for (const auto& elem : sourceVec)
+        {
+            result[elem.name] += elem.numOfMoles;
+        }
+        return result;
     }
 
     template <typename... Args>

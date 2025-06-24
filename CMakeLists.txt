@@ -15,6 +15,7 @@ add_executable(main
     src/classes/Object.cpp
     src/classes/objects/PlayerObject.cpp
     src/classes/objects/InteractableObject.cpp
+    src/classes/objects/ConverterObject.cpp
     src/classes/utils/Helpers.cpp
     src/classes/utils/Structs.hpp
     ${SOURCES}

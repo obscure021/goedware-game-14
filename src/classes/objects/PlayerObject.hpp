@@ -19,6 +19,7 @@ public:
     void update(float deltaTime) override;
 
     void addToHeldItem(gameStructs::Item item);
+    std::optional<gameStructs::Item> getAndRemoveHeldItem();
 
 protected:
     void afterSceneInit() override;

@@ -1,6 +1,7 @@
 #include "PlayerObject.hpp"
 #include "Scene.hpp"
 #include "utils/Helpers.cpp"
+#include "objects/ConverterObject.hpp"
 #include "objects/InteractableObject.hpp"
 
 PlayerObject::PlayerObject()
@@ -32,12 +33,29 @@ void PlayerObject::afterSceneInit()
             {
                 if (auto interactable = weakInteractable.lock())
                 {
+                    
                     if (interactable->distanceFromPlayer < 50.f) // example threshold
                     {
                         gameUtils::debugPrint("Interacting with: " + interactable->getName());
-                        self->addToHeldItem(interactable->asItem());
-                        interactable->interact(); // removes from scene
+                        
+                        interactable->interact();
 
+
+                        if (interactable->isConverter) {
+                            std::shared_ptr<ConverterObject> converter = std::dynamic_pointer_cast<ConverterObject>(interactable);
+
+                            if (converter) {
+                                auto heldItem = self->getAndRemoveHeldItem();
+                                if (!heldItem) break;
+
+                                converter->addToStored(heldItem.value());
+                            }
+
+                            continue;
+                        }
+                        
+                        // if not converter then remove from list (item deletes itself)
+                        self->addToHeldItem(interactable->asItem());
                         // remove from the list of interactable objects
                         for (auto it = self->interactableObjectsInScene.begin(); it != self->interactableObjectsInScene.end(); ++it)
                         {
@@ -55,6 +73,7 @@ void PlayerObject::afterSceneInit()
         }
     });
 
+    // center player on resize
     scene->onResize.subscribe([&](sf::Vector2u newSize)
                               { setPosition(static_cast<float>(newSize.x) / 2.f, static_cast<float>(newSize.y) / 2.f); });
 }
@@ -86,6 +105,15 @@ void PlayerObject::addToHeldItem(gameStructs::Item item)
 {
     gameUtils::debugPrint("Add To Held Item: " + item.ToString());
     heldItemsList.push_back(item);
+}
+
+std::optional<gameStructs::Item> PlayerObject::getAndRemoveHeldItem()
+{
+    if (heldItemsList.empty()) return std::nullopt;
+
+    gameStructs::Item get = heldItemsList.at(0);
+    heldItemsList.erase(heldItemsList.begin());
+    return get;
 }
 
 void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)

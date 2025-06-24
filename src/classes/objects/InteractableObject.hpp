@@ -15,10 +15,11 @@ class InteractableObject : public Object
 public:
     InteractableObject(const std::string &name, const std::string &texturePath, const sf::Vector2f position, const std::unordered_map<std::string, int> composition);
 
+    bool isConverter = false;
     float distanceFromPlayer;
     void update(float deltaTime) override;
 
-    void interact();
+    virtual void interact();
 
     gameStructs::Item asItem();
 
