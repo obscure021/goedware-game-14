@@ -20,19 +20,19 @@ void InteractableObject::afterSceneInit() {
 
     if (!scene)
     {
-        gameUtils::debugPrint("Scene pointer is null.");
+        DEBUG_PRINT("Scene pointer is null.");
         return;
     }
 
     auto playerShared = scene->getPlayer();
     if (!playerShared)
     {
-        gameUtils::debugPrint("Player object not found.");
+        DEBUG_PRINT("Player object not found.");
         return;
     }
 
     playerRef = playerShared.get(); // Safe
-    gameUtils::debugPrint(playerRef->getName()); // Safe
+    DEBUG_PRINT(playerRef->getName()); // Safe
 }
 
 void InteractableObject::interact()

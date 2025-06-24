@@ -35,13 +35,14 @@ public:
 
 protected:
     std::string name;
-
+    
     std::shared_ptr<Scene> scene;
     virtual void afterSceneInit();
 
-private:
     sf::Texture texture;
-    std::optional<sf::Sprite> sprite; // Sprite is optional
+    std::optional<sf::Sprite> sprite;
+
+private:
 
     std::weak_ptr<Scene> sceneWeak;
     gameUtils::Event<> sceneInitEvent;

@@ -8,17 +8,24 @@
 
 #include "utils/Structs.hpp"
 
-
 namespace gameUtils
 {
-    inline void debugPrint(const std::string &str) // Use const-ref for efficiency
+    inline void debugPrint(const std::string &message,
+                           const char *file,
+                           const char *function,
+                           int line,
+                           const std::string &type = "INFO")
     {
-        std::cout << "[DEBUG] " << str << std::endl;
+        std::string filename = std::filesystem::path(file).filename().string();
+        std::cout << "[DEBUG][" << type << "]"
+                  << "[" << filename << ":" << line << "]"
+                  << "[" << function << "] "
+                  << message << std::endl;
     }
 
     inline void printVector(std::string id, sf::Vector2f vector)
     {
-        debugPrint(id + " | x: " + std::to_string(vector.x) + " - y: " + std::to_string(vector.y));
+        debugPrint(id + " | x: " + std::to_string(vector.x) + " - y: " + std::to_string(vector.y), __FILE__, __func__, __LINE__);
     }
 
     inline sf::Vector2f normalizeVector2f(sf::Vector2f vector)
@@ -33,11 +40,11 @@ namespace gameUtils
     }
 
     // Convert map → vector
-    inline std::vector<gameStructs::ElementMole> MapToElementVector(const std::unordered_map<std::string, int>& sourceMap)
+    inline std::vector<gameStructs::ElementMole> MapToElementVector(const std::unordered_map<std::string, int> &sourceMap)
     {
         std::vector<gameStructs::ElementMole> result;
         result.reserve(sourceMap.size());
-        for (const auto& [name, moles] : sourceMap)
+        for (const auto &[name, moles] : sourceMap)
         {
             result.emplace_back(name, moles);
         }
@@ -45,10 +52,10 @@ namespace gameUtils
     }
 
     // Convert vector → map
-    inline std::unordered_map<std::string, int> ElementVectorToMap(const std::vector<gameStructs::ElementMole>& sourceVec)
+    inline std::unordered_map<std::string, int> ElementVectorToMap(const std::vector<gameStructs::ElementMole> &sourceVec)
     {
         std::unordered_map<std::string, int> result;
-        for (const auto& elem : sourceVec)
+        for (const auto &elem : sourceVec)
         {
             result[elem.name] += elem.numOfMoles;
         }
@@ -81,3 +88,7 @@ namespace gameUtils
 }
 
 #endif
+
+// Macro for easier usage
+#define DEBUG_PRINT(msg) \
+    gameUtils::debugPrint(msg, __FILE__, __func__, __LINE__, "INFO")

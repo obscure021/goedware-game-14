@@ -21,7 +21,7 @@ void Scene::addObject(std::shared_ptr<Object> object)
     {
         objects.push_back(object);
         object->connectToScene(shared_from_this());
-        gameUtils::debugPrint("Added [Object] " + object->getName() + " succesfully.");
+        DEBUG_PRINT("Added [Object] " + object->getName() + " succesfully.");
     }
     catch (const std::exception &e)
     {
@@ -35,12 +35,12 @@ void Scene::removeObject(std::shared_ptr<Object> object)
     auto it = std::remove(objects.begin(), objects.end(), object);
     if (it != objects.end())
     {
-        gameUtils::debugPrint("Removed [Object] " + object->getName() + " successfully.");
+        DEBUG_PRINT("Removed [Object] " + object->getName() + " successfully.");
         objects.erase(it, objects.end());
     }
     else
     {
-        gameUtils::debugPrint("Attempted to remove [Object] " + object->getName() + " but it was not found.");
+        DEBUG_PRINT("Attempted to remove [Object] " + object->getName() + " but it was not found.");
     }
 }
 
@@ -51,9 +51,21 @@ float Scene::getDeltaTime()
 
 void Scene::initalize()
 {
+    // sf::Clock clock;              // Clock to measure time between frames
+    // float deltaTime = 0.0f;       // Time between current and previous frame
+
     sceneInitEvent.fire();
     while (window.isOpen())
     {
+        // // Calculate time since last frame
+        // deltaTime = clock.restart().asSeconds();
+
+        // // Avoid division by zero
+        // float fps = (deltaTime > 0.0f) ? (1.0f / deltaTime) : 0.0f;
+
+        // // Output FPS to console
+        // std::cout << "FPS: " << fps << std::endl;
+
         processEvents();
         update();
         render();

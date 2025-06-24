@@ -36,7 +36,7 @@ void PlayerObject::afterSceneInit()
                     
                     if (interactable->distanceFromPlayer < 50.f) // example threshold
                     {
-                        gameUtils::debugPrint("Interacting with: " + interactable->getName());
+                        DEBUG_PRINT("Interacting with: " + interactable->getName());
                         
                         interactable->interact();
 
@@ -103,7 +103,7 @@ void PlayerObject::update(float dt)
 
 void PlayerObject::addToHeldItem(gameStructs::Item item)
 {
-    gameUtils::debugPrint("Add To Held Item: " + item.ToString());
+    DEBUG_PRINT("Add To Held Item: " + item.ToString());
     heldItemsList.push_back(item);
 }
 

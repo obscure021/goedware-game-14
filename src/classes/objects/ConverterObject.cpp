@@ -9,17 +9,18 @@ ConverterObject::ConverterObject(const std::string &name, const std::string &tex
 
 void ConverterObject::update(float deltaTime)
 {
+    InteractableObject::update(deltaTime);
 }
 
 void ConverterObject::interact()
 {
-    gameUtils::debugPrint("Converter");
+    DEBUG_PRINT("Converter");
     process();
 }
 
 void ConverterObject::addToStored(gameStructs::Item item)
 {
-    gameUtils::debugPrint("Add to Store");
+    DEBUG_PRINT("Add to Store");
     for (const auto &[rElement, rMoles] : item.composition) // iterate received elements
     {
         storedElements[rElement] += rMoles; // safely inserts if key is missing, otherwise adds
@@ -30,6 +31,6 @@ void ConverterObject::process()
 {
     for (const auto &[element, moles] : storedElements) // r = recieved
     {
-        gameUtils::debugPrint("[ConverterObject][process] " + element + ": " + std::to_string(moles));
+        DEBUG_PRINT("[ConverterObject][process] " + element + ": " + std::to_string(moles));
     }
 }
