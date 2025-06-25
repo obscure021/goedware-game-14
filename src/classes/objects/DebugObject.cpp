@@ -19,7 +19,7 @@ DebugObject::DebugObject(const std::string &name, std::string dummyTexture, sf::
     sprite->setScale({rectangleRef.size.x / static_cast<float>(texSize.x),
                       rectangleRef.size.y / static_cast<float>(texSize.y)});
 
-    sprite->setOrigin({0, 0});
+    sprite->setOrigin({0, 0}); // anchor to topleft
 
     // Apply semi-transparent green tint for debug
     sprite->setColor(sf::Color(0, 255, 0, 50));
@@ -45,6 +45,7 @@ DebugObject::DebugObject(const std::string &name, std::string dummyTexture, sf::
 
     // Center the sprite
     sprite->setOrigin({0.5f * texSize.x, 0.5f * texSize.y});
+    // sprite->setOrigin({0, 0});
 
     // Color it (e.g., red)
     sprite->setColor(sf::Color(255, 0, 0, 255));

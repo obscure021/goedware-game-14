@@ -1,17 +1,13 @@
 #include "PlayerObject.hpp"
 #include "Scene.hpp"
 #include "utils/Helpers.cpp"
+#include "utils/Variables.cpp"
 #include "objects/ConverterObject.hpp"
 #include "objects/InteractableObject.hpp"
 
 PlayerObject::PlayerObject()
     : Object("Player", "assets/player.png", {0, 0})
 {
-    std::vector<sf::FloatRect> zones = {
-        sf::FloatRect({100.f, 100.f}, {200.f, 150.f}),
-        sf::FloatRect({400.f, 300.f}, {100.f, 100.f})};
-
-    setAllowedMovementZones(zones);
 }
 
 void PlayerObject::afterSceneInit()
@@ -97,11 +93,6 @@ std::optional<gameStructs::Item> PlayerObject::getAndRemoveHeldItem()
     return get;
 }
 
-void PlayerObject::setAllowedMovementZones(const std::vector<sf::FloatRect> &zones)
-{
-    allowedMovementZones = zones;
-}
-
 void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)
 {
     this->movementVector = gameUtils::normalizeVector2f(direction) * speed * deltaTime;
@@ -121,11 +112,6 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
         return true;
     }
 
-    // Define allowed zones
-    std::vector<sf::FloatRect> zones = {
-        sf::FloatRect({-10.f, -10.f}, {110.f, 110.f}),
-        sf::FloatRect({400.f, 300.f}, {100.f, 100.f})};
-
     // Compute test point
     sf::Vector2f playerPos = getPosition() + scene->getOrigin();
     moveDir = moveDir.normalized();
@@ -144,14 +130,23 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
         movementPointDebugObject->setPosition(point);
     }
 
+    std::vector<sf::FloatRect> zones;
+    auto objects = scene->getAllObjects();
+
+    for (auto &obj : objects)
+    {
+        auto casted = std::dynamic_pointer_cast<ZoneObject>(obj);
+        if (casted)
+        {
+            zones.push_back(casted->getZone());
+        }
+    }
+
     for (auto zone : zones)
     {
         // DebugObject debugObjA("ZoneA", "assets/dummy_pixel.png", zone);
         // scene->addTemporaryObject(std::move(debugObjA));
-        
-        zone.position = scene->toWorldPosition(zone.position);
-        zone.size = scene->toWorldPosition(zone.size);
-        
+
         DebugObject debugObjB("ZoneB", "assets/dummy_pixel.png", zone);
         scene->addTemporaryObject(std::move(debugObjB));
 

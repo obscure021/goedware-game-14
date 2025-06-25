@@ -8,6 +8,7 @@
 #include "utils/Structs.hpp"
 #include "Object.hpp"
 #include "objects/DebugObject.hpp"
+#include "objects/ZoneObject.hpp"
 
 class InteractableObject;
 
@@ -22,14 +23,11 @@ public:
     void addToHeldItem(gameStructs::Item item);
     std::optional<gameStructs::Item> getAndRemoveHeldItem();
 
-    void setAllowedMovementZones(const std::vector<sf::FloatRect> &zones);
-
 protected:
     void afterSceneInit() override;
 
 private:
     std::vector<std::weak_ptr<InteractableObject>> interactableObjectsInScene;
-    std::vector<sf::FloatRect> allowedMovementZones;
 
     std::vector<gameStructs::Item> heldItemsList;
     void movement(float dt);

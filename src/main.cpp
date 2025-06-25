@@ -1,10 +1,13 @@
+#include <iostream>
+
 #include "Scene.hpp"
 #include "objects/PlayerObject.hpp"
 #include "objects/InteractableObject.hpp"
 #include "objects/AnimatedSpriteObject.hpp"
 #include "objects/ConverterObject.hpp"
 #include "objects/DebugObject.hpp"
-#include <iostream>
+#include "objects/ZoneObject.hpp"
+#include "utils/Variables.cpp"
 
 int main()
 {
@@ -43,13 +46,11 @@ int main()
 
     scene->addObject(converter);
 
-    std::vector<sf::FloatRect> zones = {
-        sf::FloatRect({-10.f, -10.f}, {110.f, 110.f}), // position, size
-        sf::FloatRect({400.f, 300.f}, {100.f, 100.f})};
+    std::vector<sf::FloatRect> zones = gameVariables::playerCollisionZones;
 
     for (size_t i = 0; i < zones.size(); i++)
     {
-        auto zoneObj = std::make_shared<DebugObject>("obj" + std::to_string(i), "assets/dummy_pixel.png", zones[i]);
+        auto zoneObj = std::make_shared<ZoneObject>("zone" + std::to_string(i), "assets/dummy_pixel.png", zones[i]);
         scene->addObject(zoneObj);
     }
 

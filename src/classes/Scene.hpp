@@ -28,8 +28,6 @@ public:
     void removeObject(std::shared_ptr<Object> object);
     const std::shared_ptr<Object> &getObjectWithName(std::string name) const;
 
-    sf::Vector2f toWorldPosition(sf::Vector2f localPosition);
-
     void initalize();
     void stop();
 

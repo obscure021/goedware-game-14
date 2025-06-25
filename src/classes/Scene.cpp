@@ -82,10 +82,6 @@ const std::shared_ptr<Object> &Scene::getObjectWithName(std::string name) const
     return nullObj;
 }
 
-sf::Vector2f Scene::toWorldPosition(sf::Vector2f localPosition)
-{
-}
-
 float Scene::getDeltaTime()
 {
     return deltaClock.restart().asSeconds(); // Returns elapsed time and restarts the clock
