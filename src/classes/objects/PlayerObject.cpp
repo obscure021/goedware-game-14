@@ -113,16 +113,16 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
     }
 
     // Compute test point
-    sf::Vector2f playerPos = getPosition() + scene->getOrigin();
+    sf::Vector2f playerPos = getPosition();
     moveDir = moveDir.normalized();
-    sf::Vector2f point = playerPos + (-moveDir);
+    moveDir.x *= 5;
+    moveDir.y *= 5;
+    sf::Vector2f point = playerPos + moveDir;
 
     DEBUG_PRINT(gameUtils::vectorToString(playerPos) + " -> " + gameUtils::vectorToString(point));
 
     if (!debugPointAdded)
     {
-        // DebugObject debugObj("MovePoint", "assets/dummy_pixel.png", point);
-        // scene->addTemporaryObject(std::move(debugObj));
         debugPointAdded = true;
     }
     else
@@ -144,23 +144,16 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
 
     for (auto zone : zones)
     {
-        // DebugObject debugObjA("ZoneA", "assets/dummy_pixel.png", zone);
-        // scene->addTemporaryObject(std::move(debugObjA));
+        // DebugObject debugObjB("ZoneB", "assets/dummy_pixel.png", point);
+        // scene->addTemporaryObject(std::move(debugObjB));
 
-        DebugObject debugObjB("ZoneB", "assets/dummy_pixel.png", zone);
-        scene->addTemporaryObject(std::move(debugObjB));
-
-        if (!(point.x <= zone.position.x &&
-              point.x >= zone.position.x + zone.size.x &&
-              point.y <= zone.position.y &&
-              point.y >= zone.position.y + zone.size.y))
+        if (!zone.contains(point))
             continue;
 
-        DEBUG_PRINT("-------------- ZONE CONTAINS POINT 123");
         return true;
     }
 
-    return true;
+    return false;
 }
 
 void PlayerObject::update(float dt)
