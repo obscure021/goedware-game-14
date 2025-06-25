@@ -29,6 +29,8 @@ private:
 
     std::vector<gameStructs::Item> heldItemsList;
     void move(sf::Vector2f direction, float deltaTime, float speed = 0);
+
+    bool canMove();
 };
 
 #endif

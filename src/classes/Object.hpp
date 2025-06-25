@@ -21,8 +21,8 @@ public:
     void setPosition(float x, float y);
     void setPosition(sf::Vector2f positionVector);
 
-    void setOrigin(float x, float y);
-    void setOrigin(sf::Vector2f positionVector);
+    void setAnchor(float x, float y);
+    void setAnchor(sf::Vector2f positionVector);
 
     sf::Vector2f getPosition() const;
     void move(sf::Vector2f movementVector);
@@ -33,9 +33,12 @@ public:
     void draw(sf::RenderWindow &window) const;
     virtual void update(float deltaTime);
 
+    const std::optional<sf::Sprite> &getSprite() const;
+    const sf::Texture &getTexture() const;
+
 protected:
     std::string name;
-    
+
     std::shared_ptr<Scene> scene;
     virtual void afterSceneInit();
 
@@ -43,7 +46,6 @@ protected:
     std::optional<sf::Sprite> sprite;
 
 private:
-
     std::weak_ptr<Scene> sceneWeak;
     gameUtils::Event<> sceneInitEvent;
 };

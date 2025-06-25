@@ -74,12 +74,16 @@ void PlayerObject::afterSceneInit()
     });
 
     // center player on resize
-    scene->onResize.subscribe([&](sf::Vector2u newSize)
-                              { setPosition(static_cast<float>(newSize.x) / 2.f, static_cast<float>(newSize.y) / 2.f); });
+    // scene->onResize.subscribe([&](sf::Vector2u newSize)
+    //                           { setPosition(static_cast<float>(newSize.x) / 2.f, static_cast<float>(newSize.y) / 2.f); });
 }
 
 void PlayerObject::update(float dt)
 {
+    // DEBUG_PRINT(gameUtils::vectorToString(getPosition()) + " " + std::to_string(canMove()));
+
+    // if (!canMove()) return;
+
     sf::Vector2f direction{0.f, 0.f};
 
     if (scene->isKeyPressed(sf::Keyboard::Scan::W))
@@ -99,6 +103,9 @@ void PlayerObject::update(float dt)
     {
         move({0.f, 0.f}, dt, 0.f);
     }
+
+    // auto converter = scene->getObjectWithName("converter");
+    // DEBUG_PRINT(std::to_string(scene->isPixelColliding(shared_from_this(), converter)));
 }
 
 void PlayerObject::addToHeldItem(gameStructs::Item item)
@@ -120,3 +127,10 @@ void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)
 {
     this->movementVector = gameUtils::normalizeVector2f(direction) * speed * deltaTime;
 }
+
+// bool PlayerObject::canMove()
+// {
+//     auto pos = getPosition();
+//     scene->getOrigin();
+//     return pos.x > -100 && pos.x < 100 && pos.y > -100 && pos.y < 100;
+// }

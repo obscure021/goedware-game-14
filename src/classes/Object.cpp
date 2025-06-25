@@ -39,13 +39,12 @@ void Object::setPosition(float x, float y)
     setPosition({x, y});
 }
 
-void Object::setOrigin(float x, float y)
+void Object::setAnchor(float x, float y)
 {
-    if (sprite)
-        sprite->setOrigin({x, y});
+    setAnchor({x, y});
 }
 
-void Object::setOrigin(sf::Vector2f originVector)
+void Object::setAnchor(sf::Vector2f originVector)
 {
     if (sprite)
         sprite->setOrigin(originVector);
@@ -99,6 +98,19 @@ void Object::draw(sf::RenderWindow &window) const
 
 void Object::update(float deltaTime)
 {
+}
+
+const std::optional<sf::Sprite> &Object::getSprite() const
+{
+    if (!sprite)
+        return std::nullopt;
+
+    return sprite.value();
+}
+
+const sf::Texture &Object::getTexture() const
+{
+    return texture;
 }
 
 void Object::afterSceneInit()

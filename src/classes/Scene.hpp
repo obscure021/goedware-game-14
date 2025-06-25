@@ -20,18 +20,21 @@ public:
     bool isKeyPressed(sf::Keyboard::Scan keyScan);
 
     gameUtils::Event<sf::Vector2u> onResize;
-    sf::RenderWindow& getWindow();
-    
+    sf::RenderWindow &getWindow();
+
     void addObject(std::shared_ptr<Object> object);
     void removeObject(std::shared_ptr<Object> object);
-    
+    const std::shared_ptr<Object>& getObjectWithName(std::string name) const;
+
+    bool isPixelColliding(const std::shared_ptr<Object> &objectA, const std::shared_ptr<Object> &objectB);
+
     void initalize();
     void stop();
 
     gameUtils::Event<> sceneInitEvent;
 
     std::shared_ptr<PlayerObject> getPlayer();
-    const std::vector<std::shared_ptr<Object>>& getAllObjects() const;
+    const std::vector<std::shared_ptr<Object>> &getAllObjects() const;
     sf::Vector2f getOrigin();
 
 private:

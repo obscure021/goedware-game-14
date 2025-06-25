@@ -23,9 +23,9 @@ namespace gameUtils
                   << message << std::endl;
     }
 
-    inline void printVector(std::string id, sf::Vector2f vector)
+    inline std::string vectorToString(sf::Vector2f vector)
     {
-        debugPrint(id + " | x: " + std::to_string(vector.x) + " - y: " + std::to_string(vector.y), __FILE__, __func__, __LINE__);
+        return std::to_string(vector.x) + ", " + std::to_string(vector.y);
     }
 
     inline sf::Vector2f normalizeVector2f(sf::Vector2f vector)
