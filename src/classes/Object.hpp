@@ -25,7 +25,6 @@ public:
     void setAnchor(sf::Vector2f positionVector);
 
     sf::Vector2f getPosition() const;
-    sf::Vector2f getAbsPosition() const;
     void move(sf::Vector2f movementVector);
 
     void connectToScene(std::shared_ptr<Scene> sceneRef);

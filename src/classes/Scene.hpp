@@ -47,6 +47,7 @@ private:
     void render();
 
     sf::RenderWindow window;
+    sf::View cameraView;
     std::vector<std::shared_ptr<Object>> objects;
     std::vector<DebugObject> tempDebugObjects; // for value-based debug objects only
 

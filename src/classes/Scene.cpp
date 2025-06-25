@@ -7,6 +7,9 @@
 Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector2f origin)
     : window(sf::VideoMode({windowSize.x, windowSize.y}), title), origin(origin)
 {
+    cameraView.setCenter(sf::Vector2f(windowSize.x / 2, windowSize.y / 2));
+    cameraView.setSize(window.getDefaultView().getSize());
+
     window.setFramerateLimit(60);
 }
 
@@ -49,7 +52,6 @@ void Scene::clearTemporaryObjects()
 {
     tempDebugObjects.clear();
 }
-
 
 void Scene::removeObject(std::shared_ptr<Object> object)
 {
@@ -168,21 +170,22 @@ void Scene::update()
     auto player = getPlayer();
     if (player)
     {
-        sf::Vector2f movementVector = player->movementVector;
-        for (const auto &obj : objects)
-        {
-            if (obj->getName() == "Player")
-                continue;
+        cameraView.setCenter(player->getPosition());
+        // for (const auto &obj : objects)
+        // {
+        //     if (obj->getName() == "Player")
+        //         continue;
 
-            obj->move(movementVector);
-            localToWorldCorrection= movementVector;
-        }
+        //     obj->move(movementVector);
+        //     localToWorldCorrection= movementVector;
+        // }
     }
 }
 
 void Scene::render()
 {
     window.clear();
+    window.setView(cameraView);
 
     for (const auto &obj : objects)
     {
@@ -193,7 +196,6 @@ void Scene::render()
     {
         tempObj.draw(window);
     }
-
 
     window.display();
 }

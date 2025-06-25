@@ -105,6 +105,7 @@ void PlayerObject::setAllowedMovementZones(const std::vector<sf::FloatRect> &zon
 void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)
 {
     this->movementVector = gameUtils::normalizeVector2f(direction) * speed * deltaTime;
+    Object::move(movementVector);
 }
 
 bool PlayerObject::canMove(sf::Vector2f moveDir)
@@ -178,13 +179,13 @@ void PlayerObject::movement(float dt)
     sf::Vector2f direction{0.f, 0.f};
 
     if (scene->isKeyPressed(sf::Keyboard::Scan::W))
-        direction.y += 1.f;
-    if (scene->isKeyPressed(sf::Keyboard::Scan::S))
         direction.y -= 1.f;
+    if (scene->isKeyPressed(sf::Keyboard::Scan::S))
+        direction.y += 1.f;
     if (scene->isKeyPressed(sf::Keyboard::Scan::A))
-        direction.x += 1.f;
-    if (scene->isKeyPressed(sf::Keyboard::Scan::D))
         direction.x -= 1.f;
+    if (scene->isKeyPressed(sf::Keyboard::Scan::D))
+        direction.x += 1.f;
 
     if (!canMove(direction))
     {

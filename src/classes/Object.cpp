@@ -52,13 +52,6 @@ void Object::setAnchor(sf::Vector2f originVector)
 
 sf::Vector2f Object::getPosition() const
 {
-    if (sprite && scene)
-        return sprite->getPosition() - scene->getOrigin();
-    return sf::Vector2f{0.f, 0.f}; // Default fallback
-}
-
-sf::Vector2f Object::getAbsPosition() const
-{
     if (sprite)
         return sprite->getPosition();
     return sf::Vector2f{0.f, 0.f}; // Default fallback
@@ -66,7 +59,7 @@ sf::Vector2f Object::getAbsPosition() const
 
 void Object::move(sf::Vector2f movementVector)
 {
-    sf::Vector2f pos = getAbsPosition();
+    sf::Vector2f pos = getPosition();
     pos += movementVector;
     setPosition(pos);
 }
