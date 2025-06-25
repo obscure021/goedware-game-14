@@ -8,6 +8,7 @@ class AnimatedSpriteObject : public Object
 {
 public:
     AnimatedSpriteObject(const std::string &name,
+                         const std::string &loadingTexture,
                          const std::string &imageDirectory,
                          const sf::Vector2f &position,
                          float frameTime = 0.15f); // seconds per frame

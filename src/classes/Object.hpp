@@ -25,19 +25,19 @@ public:
     void setAnchor(sf::Vector2f positionVector);
 
     sf::Vector2f getPosition() const;
+    sf::Vector2f getAbsPosition() const;
     void move(sf::Vector2f movementVector);
 
     void connectToScene(std::shared_ptr<Scene> sceneRef);
     void destroySelf();
 
-    void draw(sf::RenderWindow &window) const;
+    virtual void draw(sf::RenderWindow &window) const;
     virtual void update(float deltaTime);
 
-    const std::optional<sf::Sprite> &getSprite() const;
     const sf::Texture &getTexture() const;
 
 protected:
-    std::string name;
+std::string name;
 
     std::shared_ptr<Scene> scene;
     virtual void afterSceneInit();

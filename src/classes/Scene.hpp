@@ -23,10 +23,12 @@ public:
     sf::RenderWindow &getWindow();
 
     void addObject(std::shared_ptr<Object> object);
+    void addTemporaryObject(Object &&tempObject);
+    void clearTemporaryObjects();
     void removeObject(std::shared_ptr<Object> object);
-    const std::shared_ptr<Object>& getObjectWithName(std::string name) const;
+    const std::shared_ptr<Object> &getObjectWithName(std::string name) const;
 
-    bool isPixelColliding(const std::shared_ptr<Object> &objectA, const std::shared_ptr<Object> &objectB);
+    sf::Vector2f toWorldPosition(sf::Vector2f localPosition);
 
     void initalize();
     void stop();
@@ -46,11 +48,14 @@ private:
 
     sf::RenderWindow window;
     std::vector<std::shared_ptr<Object>> objects;
+    std::vector<DebugObject> tempDebugObjects; // for value-based debug objects only
 
     std::unordered_set<sf::Keyboard::Scan> heldKeys;
 
     sf::Clock deltaClock; // Clock to measure time between frames
-    sf::Vector2f origin;
+    const sf::Vector2f origin;
+
+    sf::Vector2f localToWorldCorrection;
 };
 
 #endif

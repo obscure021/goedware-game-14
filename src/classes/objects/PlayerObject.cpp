@@ -7,6 +7,11 @@
 PlayerObject::PlayerObject()
     : Object("Player", "assets/player.png", {0, 0})
 {
+    std::vector<sf::FloatRect> zones = {
+        sf::FloatRect({100.f, 100.f}, {200.f, 150.f}),
+        sf::FloatRect({400.f, 300.f}, {100.f, 100.f})};
+
+    setAllowedMovementZones(zones);
 }
 
 void PlayerObject::afterSceneInit()
@@ -33,27 +38,29 @@ void PlayerObject::afterSceneInit()
             {
                 if (auto interactable = weakInteractable.lock())
                 {
-                    
+
                     if (interactable->distanceFromPlayer < 50.f) // example threshold
                     {
                         DEBUG_PRINT("Interacting with: " + interactable->getName());
-                        
+
                         interactable->interact();
 
-
-                        if (interactable->isConverter) {
+                        if (interactable->isConverter)
+                        {
                             std::shared_ptr<ConverterObject> converter = std::dynamic_pointer_cast<ConverterObject>(interactable);
 
-                            if (converter) {
+                            if (converter)
+                            {
                                 auto heldItem = self->getAndRemoveHeldItem();
-                                if (!heldItem) break;
+                                if (!heldItem)
+                                    break;
 
                                 converter->addToStored(heldItem.value());
                             }
 
                             continue;
                         }
-                        
+
                         // if not converter then remove from list (item deletes itself)
                         self->addToHeldItem(interactable->asItem());
                         // remove from the list of interactable objects
@@ -72,17 +79,101 @@ void PlayerObject::afterSceneInit()
             }
         }
     });
+}
 
-    // center player on resize
-    // scene->onResize.subscribe([&](sf::Vector2u newSize)
-    //                           { setPosition(static_cast<float>(newSize.x) / 2.f, static_cast<float>(newSize.y) / 2.f); });
+void PlayerObject::addToHeldItem(gameStructs::Item item)
+{
+    DEBUG_PRINT("Add To Held Item: " + item.ToString());
+    heldItemsList.push_back(item);
+}
+
+std::optional<gameStructs::Item> PlayerObject::getAndRemoveHeldItem()
+{
+    if (heldItemsList.empty())
+        return std::nullopt;
+
+    gameStructs::Item get = heldItemsList.at(0);
+    heldItemsList.erase(heldItemsList.begin());
+    return get;
+}
+
+void PlayerObject::setAllowedMovementZones(const std::vector<sf::FloatRect> &zones)
+{
+    allowedMovementZones = zones;
+}
+
+void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)
+{
+    this->movementVector = gameUtils::normalizeVector2f(direction) * speed * deltaTime;
+}
+
+bool PlayerObject::canMove(sf::Vector2f moveDir)
+{
+    if (moveDir.lengthSquared() == 0)
+    {
+        if (debugPointAdded)
+        {
+            scene->clearTemporaryObjects();
+            debugPointAdded = false;
+        }
+
+        return true;
+    }
+
+    // Define allowed zones
+    std::vector<sf::FloatRect> zones = {
+        sf::FloatRect({-10.f, -10.f}, {110.f, 110.f}),
+        sf::FloatRect({400.f, 300.f}, {100.f, 100.f})};
+
+    // Compute test point
+    sf::Vector2f playerPos = getPosition() + scene->getOrigin();
+    moveDir = moveDir.normalized();
+    sf::Vector2f point = playerPos + (-moveDir);
+
+    DEBUG_PRINT(gameUtils::vectorToString(playerPos) + " -> " + gameUtils::vectorToString(point));
+
+    if (!debugPointAdded)
+    {
+        // DebugObject debugObj("MovePoint", "assets/dummy_pixel.png", point);
+        // scene->addTemporaryObject(std::move(debugObj));
+        debugPointAdded = true;
+    }
+    else
+    {
+        movementPointDebugObject->setPosition(point);
+    }
+
+    for (auto zone : zones)
+    {
+        // DebugObject debugObjA("ZoneA", "assets/dummy_pixel.png", zone);
+        // scene->addTemporaryObject(std::move(debugObjA));
+        
+        zone.position = scene->toWorldPosition(zone.position);
+        zone.size = scene->toWorldPosition(zone.size);
+        
+        DebugObject debugObjB("ZoneB", "assets/dummy_pixel.png", zone);
+        scene->addTemporaryObject(std::move(debugObjB));
+
+        if (!(point.x <= zone.position.x &&
+              point.x >= zone.position.x + zone.size.x &&
+              point.y <= zone.position.y &&
+              point.y >= zone.position.y + zone.size.y))
+            continue;
+
+        DEBUG_PRINT("-------------- ZONE CONTAINS POINT 123");
+        return true;
+    }
+
+    return true;
 }
 
 void PlayerObject::update(float dt)
 {
-    // DEBUG_PRINT(gameUtils::vectorToString(getPosition()) + " " + std::to_string(canMove()));
+    movement(dt);
+}
 
-    // if (!canMove()) return;
+void PlayerObject::movement(float dt)
+{
 
     sf::Vector2f direction{0.f, 0.f};
 
@@ -95,42 +186,11 @@ void PlayerObject::update(float dt)
     if (scene->isKeyPressed(sf::Keyboard::Scan::D))
         direction.x -= 1.f;
 
-    if (direction != sf::Vector2f{0.f, 0.f})
-    {
-        move(gameUtils::normalizeVector2f(direction), dt, 100.f);
-    }
-    else
+    if (!canMove(direction))
     {
         move({0.f, 0.f}, dt, 0.f);
+        return;
     }
 
-    // auto converter = scene->getObjectWithName("converter");
-    // DEBUG_PRINT(std::to_string(scene->isPixelColliding(shared_from_this(), converter)));
+    move(gameUtils::normalizeVector2f(direction), dt, 100.f);
 }
-
-void PlayerObject::addToHeldItem(gameStructs::Item item)
-{
-    DEBUG_PRINT("Add To Held Item: " + item.ToString());
-    heldItemsList.push_back(item);
-}
-
-std::optional<gameStructs::Item> PlayerObject::getAndRemoveHeldItem()
-{
-    if (heldItemsList.empty()) return std::nullopt;
-
-    gameStructs::Item get = heldItemsList.at(0);
-    heldItemsList.erase(heldItemsList.begin());
-    return get;
-}
-
-void PlayerObject::move(sf::Vector2f direction, float deltaTime, float speed)
-{
-    this->movementVector = gameUtils::normalizeVector2f(direction) * speed * deltaTime;
-}
-
-// bool PlayerObject::canMove()
-// {
-//     auto pos = getPosition();
-//     scene->getOrigin();
-//     return pos.x > -100 && pos.x < 100 && pos.y > -100 && pos.y < 100;
-// }

@@ -17,6 +17,7 @@ add_executable(main
     src/classes/objects/InteractableObject.cpp
     src/classes/objects/AnimatedSpriteObject.cpp
     src/classes/objects/ConverterObject.cpp
+    src/classes/objects/DebugObject.cpp
     src/classes/utils/Helpers.cpp
     src/classes/utils/Structs.hpp
     ${SOURCES}

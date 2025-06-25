@@ -10,10 +10,11 @@ namespace fs = std::filesystem;
 
 AnimatedSpriteObject::AnimatedSpriteObject(
     const std::string &name,
+    const std::string &loadingTexture,
     const std::string &imageDirectory,
     const sf::Vector2f &position,
     float frameTime)
-    : Object(name, "assets/anim_test/box_1.png", position),
+    : Object(name, loadingTexture, position),
       frameDuration(frameTime)
 {
     if (!buildSpritesheetFromDirectory(imageDirectory))

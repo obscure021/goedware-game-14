@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 
-Scene::Scene(sf::Vector2u windowSize, const std::string &title, sf::Vector2f origin)
+Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector2f origin)
     : window(sf::VideoMode({windowSize.x, windowSize.y}), title), origin(origin)
 {
     window.setFramerateLimit(60);
@@ -21,7 +21,7 @@ void Scene::addObject(std::shared_ptr<Object> object)
     {
         objects.push_back(object);
         object->connectToScene(shared_from_this());
-        DEBUG_PRINT("Added [Object] " + object->getName() + " succesfully.");
+        DEBUG_PRINT("Added " + object->getName() + " succesfully.");
     }
     catch (const std::exception &e)
     {
@@ -29,6 +29,27 @@ void Scene::addObject(std::shared_ptr<Object> object)
         stop();
     }
 }
+
+void Scene::addTemporaryObject(Object &&tempObject)
+{
+    // This assumes you're using DebugObject specifically. Adjust type if needed.
+    DebugObject *casted = dynamic_cast<DebugObject *>(&tempObject);
+    if (casted)
+    {
+        tempDebugObjects.emplace_back(std::move(*casted));
+        DEBUG_PRINT("Added Temp " + casted->getName());
+    }
+    else
+    {
+        DEBUG_PRINT("Rejected temporary object. Only DebugObject supported.");
+    }
+}
+
+void Scene::clearTemporaryObjects()
+{
+    tempDebugObjects.clear();
+}
+
 
 void Scene::removeObject(std::shared_ptr<Object> object)
 {
@@ -59,54 +80,8 @@ const std::shared_ptr<Object> &Scene::getObjectWithName(std::string name) const
     return nullObj;
 }
 
-/// @brief Check if non-transparent pixel exists at either objA center or objB center
-/// @param objA
-/// @param objB
-/// @return True if pixel is not transparent
-bool Scene::isPixelColliding(const std::shared_ptr<Object> &objA, const std::shared_ptr<Object> &objB)
+sf::Vector2f Scene::toWorldPosition(sf::Vector2f localPosition)
 {
-    if (!objA || !objB)
-        return false;
-
-    const auto &spriteAOpt = objA->getSprite();
-    const auto &spriteBOpt = objB->getSprite();
-
-    if (!spriteAOpt.has_value() || !spriteBOpt.has_value())
-        return false;
-
-    const auto &spriteA = spriteAOpt.value();
-    const auto &spriteB = spriteBOpt.value();
-
-    const auto &texA = objA->getTexture();
-    const auto &texB = objB->getTexture();
-
-    sf::Image imgA = texA.copyToImage();
-    sf::Image imgB = texB.copyToImage();
-
-    // Transform objB's world position into objA's local texture space
-    sf::Vector2f posBInA = spriteA.getInverseTransform().transformPoint(objB->getPosition());
-    sf::Vector2i texCoordBInA(static_cast<int>(posBInA.x), static_cast<int>(posBInA.y));
-
-    // Transform objA's world position into objB's local texture space
-    sf::Vector2f posAInB = spriteB.getInverseTransform().transformPoint(objA->getPosition());
-    sf::Vector2i texCoordAInB(static_cast<int>(posAInB.x), static_cast<int>(posAInB.y));
-
-    // Bounds checking before accessing pixels
-    if (texCoordBInA.x >= 0 && texCoordBInA.x < static_cast<int>(imgA.getSize().x) &&
-        texCoordBInA.y >= 0 && texCoordBInA.y < static_cast<int>(imgA.getSize().y))
-    {
-        if (imgA.getPixel(sf::Vector2u(texCoordBInA.x, texCoordBInA.y)).a > 0)
-            return true;
-    }
-
-    if (texCoordAInB.x >= 0 && texCoordAInB.x < static_cast<int>(imgB.getSize().x) &&
-        texCoordAInB.y >= 0 && texCoordAInB.y < static_cast<int>(imgB.getSize().y))
-    {
-        if (imgB.getPixel(sf::Vector2u(texCoordAInB.x, texCoordAInB.y)).a > 0)
-            return true;
-    }
-
-    return false;
 }
 
 float Scene::getDeltaTime()
@@ -183,6 +158,11 @@ void Scene::update()
         obj->update(deltaTime); // Pass delta time to each object's update method
     }
 
+    for (auto &tempObj : tempDebugObjects)
+    {
+        tempObj.update(deltaTime);
+    }
+
     // LOGIC
     // player movement (move the entire scene instead of player)
     auto player = getPlayer();
@@ -195,6 +175,7 @@ void Scene::update()
                 continue;
 
             obj->move(movementVector);
+            localToWorldCorrection= movementVector;
         }
     }
 }
@@ -204,7 +185,15 @@ void Scene::render()
     window.clear();
 
     for (const auto &obj : objects)
+    {
         obj->draw(window);
+    }
+
+    for (const auto &tempObj : tempDebugObjects)
+    {
+        tempObj.draw(window);
+    }
+
 
     window.display();
 }
@@ -246,5 +235,5 @@ const std::vector<std::shared_ptr<Object>> &Scene::getAllObjects() const
 
 sf::Vector2f Scene::getOrigin()
 {
-    return origin;
+    return origin + localToWorldCorrection;
 }

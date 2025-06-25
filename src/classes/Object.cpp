@@ -52,6 +52,13 @@ void Object::setAnchor(sf::Vector2f originVector)
 
 sf::Vector2f Object::getPosition() const
 {
+    if (sprite && scene)
+        return sprite->getPosition() - scene->getOrigin();
+    return sf::Vector2f{0.f, 0.f}; // Default fallback
+}
+
+sf::Vector2f Object::getAbsPosition() const
+{
     if (sprite)
         return sprite->getPosition();
     return sf::Vector2f{0.f, 0.f}; // Default fallback
@@ -59,7 +66,7 @@ sf::Vector2f Object::getPosition() const
 
 void Object::move(sf::Vector2f movementVector)
 {
-    sf::Vector2f pos = getPosition();
+    sf::Vector2f pos = getAbsPosition();
     pos += movementVector;
     setPosition(pos);
 }
@@ -98,14 +105,6 @@ void Object::draw(sf::RenderWindow &window) const
 
 void Object::update(float deltaTime)
 {
-}
-
-const std::optional<sf::Sprite> &Object::getSprite() const
-{
-    if (!sprite)
-        return std::nullopt;
-
-    return sprite.value();
 }
 
 const sf::Texture &Object::getTexture() const
