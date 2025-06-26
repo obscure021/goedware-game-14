@@ -6,9 +6,10 @@
 #include "objects/InteractableObject.hpp"
 
 PlayerObject::PlayerObject()
-    : AnimatedSpriteObject("Player", "assets/player/idle.png", {0, 0})
+    : AnimatedSpriteObject("Player", "assets/player/idle.png", {150, -60})
 {
     setScale({2, 2});
+    setAnchor({8, 8});
 }
 
 void PlayerObject::afterSceneInit()
@@ -157,8 +158,8 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
     // Compute test point
     sf::Vector2f playerPos = getPosition();
     moveDir = moveDir.normalized();
-    moveDir.x *= 5;
-    moveDir.y *= 5;
+    moveDir.x *= 10;
+    moveDir.y *= 15;
     sf::Vector2f point = playerPos + moveDir;
 
     if (!debugPointAdded)
@@ -219,6 +220,8 @@ void PlayerObject::update(float dt)
 {
     AnimatedSpriteObject::update(dt);
     movement(dt);
+
+    DEBUG_PRINT(gameUtils::vectorToString(getPosition() - scene->getOrigin()));
 }
 
 void PlayerObject::movement(float dt)

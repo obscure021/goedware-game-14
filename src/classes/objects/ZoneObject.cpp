@@ -4,7 +4,7 @@
 ZoneObject::ZoneObject(const std::string &name, std::string dummyTexture, sf::FloatRect zone, bool showArea)
     : Object(name, dummyTexture, zone.position), zone(zone), showArea(false)
 {
-    if (!showArea) return;
+    // if (!showArea) return;
 
     // Ensure sprite exists
     if (!sprite.has_value())
@@ -21,7 +21,7 @@ ZoneObject::ZoneObject(const std::string &name, std::string dummyTexture, sf::Fl
     sprite->setScale({zone.size.x / static_cast<float>(texSize.x),
                       zone.size.y / static_cast<float>(texSize.y)});
 
-    sprite->setOrigin(origin); // anchor to topleft
+    sprite->setOrigin(origin);
 
     // Apply semi-transparent green tint for debug
     sprite->setColor(sf::Color(0, 255, 0, 50));
@@ -36,8 +36,8 @@ const sf::FloatRect ZoneObject::getZone()
 }
 void ZoneObject::draw(sf::RenderWindow &window) const
 {
-    if (!showArea) return;
-    
+    // if (!showArea) return;
+
     if (sprite.has_value())
         window.draw(*sprite);
 }

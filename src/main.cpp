@@ -20,6 +20,7 @@ int main()
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(windowSize, "Game", ORIGIN);
 
     auto background = std::make_shared<Object>("background", "assets/stars.png", sf::Vector2f({0, 0}));
+    auto ship = std::make_shared<Object>("background", "assets/ship.png", sf::Vector2f({0, 0}));
     auto player = std::make_shared<PlayerObject>();
 
     std::unordered_map<std::string, int> compA = {
@@ -32,13 +33,10 @@ int main()
         {"oxygen", 10}};
     auto boxB = std::make_shared<InteractableObject>("boxB", "assets/box.png", sf::Vector2f({120, 0}), compB);
 
-    // auto animTest = std::make_shared<AnimatedSpriteObject>("animTest", "assets/anim_test/box_blue.png", "assets/anim_test/", sf::Vector2f({0, 0}));
-
     auto converter = std::make_shared<ConverterObject>("converter", "assets/box.png", sf::Vector2f({-100, 0}));
 
     scene->addObject(background);
-
-    // scene->addObject(animTest);
+    scene->addObject(ship);
     
     scene->addObject(boxA);
     scene->addObject(boxB);
@@ -49,7 +47,7 @@ int main()
     
     for (size_t i = 0; i < zones.size(); i++)
     {
-        auto zoneObj = std::make_shared<ZoneObject>("zone" + std::to_string(i), "assets/dummy_pixel.png", zones[i]);
+        auto zoneObj = std::make_shared<ZoneObject>("zone" + std::to_string(i), "assets/dummy_pixel.png", zones[i], true);
         scene->addObject(zoneObj);
     }
     scene->addObject(player);

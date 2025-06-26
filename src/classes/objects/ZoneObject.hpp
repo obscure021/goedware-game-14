@@ -7,7 +7,7 @@
 class ZoneObject : public Object
 {
 public:
-    ZoneObject(const std::string &name, std::string dummyTexture, sf::FloatRect rectangle, bool showArea = false); // seconds per frame
+    ZoneObject(const std::string &name, std::string dummyTexture, sf::FloatRect rectangle, bool showArea); // seconds per frame
 
     const sf::FloatRect getZone();
 
@@ -17,5 +17,5 @@ public:
 private:
     bool showArea;
     sf::FloatRect zone;
-    sf::Vector2f origin = {0.5f, 0.5f};
+    sf::Vector2f origin = {0.f, 0.f};
 };

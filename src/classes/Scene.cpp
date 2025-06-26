@@ -5,7 +5,7 @@
 #include <iostream>
 
 Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector2f origin)
-    : window(sf::VideoMode({windowSize.x, windowSize.y}), title), origin(origin)
+    : window(sf::VideoMode({windowSize.x, windowSize.y}), title, sf::Style::Titlebar | sf::Style::Close), origin(origin)
 {
     cameraView.setCenter(sf::Vector2f(windowSize.x / 2, windowSize.y / 2));
     cameraView.setSize(window.getDefaultView().getSize());
