@@ -11,6 +11,7 @@ Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector
     cameraView.setSize(window.getDefaultView().getSize());
 
     window.setFramerateLimit(60);
+    window.setKeyRepeatEnabled(false);
 }
 
 sf::RenderWindow &Scene::getWindow()
@@ -142,6 +143,7 @@ void Scene::processEvents()
         else if (const auto *keyReleased = event->getIf<sf::Event::KeyReleased>())
         {
             heldKeys.erase(keyReleased->scancode); // remove from set
+            onKeyReleased.fire(keyReleased->scancode);
         }
     }
 }

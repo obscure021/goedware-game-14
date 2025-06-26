@@ -5,6 +5,7 @@
 
 #include "objects/AnimatedSpriteObject.hpp"
 #include "utils/Helpers.cpp"
+#include "AnimatedSpriteObject.hpp"
 
 namespace fs = std::filesystem;
 
@@ -20,6 +21,60 @@ AnimatedSpriteObject::AnimatedSpriteObject(
     if (!buildSpritesheetFromDirectory(imageDirectory))
     {
         throw std::runtime_error("Failed to build spritesheet from: " + imageDirectory);
+    }
+
+    sprite->setTexture(texture);
+    sprite->setTextureRect(frames[0]);
+}
+
+AnimatedSpriteObject::AnimatedSpriteObject(const std::string &name, const std::string &spriteSheet, const sf::Vector2f &position, float frameTime)
+    : Object(name, spriteSheet, position),
+      frameDuration(frameTime)
+{
+    if (!texture.loadFromFile(spriteSheet))
+    {
+        throw std::runtime_error("Failed to load spritesheet texture: " + spriteSheet);
+    }
+
+    int frameCount = texture.getSize().x / texture.getSize().y;
+
+    if (!buildFramesFromSpriteSheet(frameCount))
+    {
+        throw std::runtime_error("Failed to split spritesheet into frames: " + spriteSheet);
+    }
+
+    sprite->setTexture(texture);
+    sprite->setTextureRect(frames[0]);
+}
+
+void AnimatedSpriteObject::update(float deltaTime)
+{
+    if (!sprite || frames.empty())
+        return;
+
+    timeAccumulator += deltaTime;
+    if (timeAccumulator >= frameDuration)
+    {
+        currentFrame = (currentFrame + 1) % frames.size();
+        sprite.value().setTextureRect(frames[currentFrame]); // CHECK
+        timeAccumulator = 0.0f;
+    }
+}
+
+void AnimatedSpriteObject::changeSpriteSheet(const std::string &spriteSheet)
+{
+    currentFrame = 0;
+
+    if (!texture.loadFromFile(spriteSheet))
+    {
+        throw std::runtime_error("Failed to load spritesheet texture: " + spriteSheet);
+    }
+
+    int frameCount = texture.getSize().x / texture.getSize().y;
+
+    if (!buildFramesFromSpriteSheet(frameCount))
+    {
+        throw std::runtime_error("Failed to split spritesheet into frames: " + spriteSheet);
     }
 
     sprite->setTexture(texture);
@@ -88,16 +143,21 @@ bool AnimatedSpriteObject::buildSpritesheetFromDirectory(const std::string &path
     return true;
 }
 
-void AnimatedSpriteObject::update(float deltaTime)
+bool AnimatedSpriteObject::buildFramesFromSpriteSheet(int frameCount)
 {
-    if (!sprite || frames.empty())
-        return;
+    if (frameCount <= 0)
+        return false;
 
-    timeAccumulator += deltaTime;
-    if (timeAccumulator >= frameDuration)
+    const sf::Vector2u texSize = texture.getSize();
+    const unsigned int frameWidth = texSize.x / frameCount;
+    const unsigned int frameHeight = texSize.y;
+
+    frames.clear();
+
+    for (int i = 0; i < frameCount; ++i)
     {
-        currentFrame = (currentFrame + 1) % frames.size();
-        sprite.value().setTextureRect(frames[currentFrame]); // CHECK
-        timeAccumulator = 0.0f;
+        frames.emplace_back(sf::IntRect(sf::Vector2i(i * frameWidth, 0), sf::Vector2i(frameWidth, frameHeight)));
     }
+
+    return true;
 }

@@ -6,8 +6,9 @@
 #include "objects/InteractableObject.hpp"
 
 PlayerObject::PlayerObject()
-    : Object("Player", "assets/player.png", {0, 0})
+    : AnimatedSpriteObject("Player", "assets/player/idle.png", {0, 0})
 {
+    setScale({2, 2});
 }
 
 void PlayerObject::afterSceneInit()
@@ -27,54 +28,95 @@ void PlayerObject::afterSceneInit()
 
     // cast to use shared_from_this of Object
     std::shared_ptr<PlayerObject> self = std::dynamic_pointer_cast<PlayerObject>(shared_from_this());
-    scene->onKeyPressed.subscribe([self](auto keyScan) { // self to allow accessing members of PlayerObject
+    scene->onKeyPressed.subscribe([self](auto keyScan) { //
         if (keyScan == sf::Keyboard::Scan::Space)
         {
-            for (const auto &weakInteractable : self->interactableObjectsInScene)
+            self->interact(self);
+            return;
+        }
+
+        sf::Vector2f newMoveDir;
+
+        if (keyScan == sf::Keyboard::Scan::W)
+            newMoveDir = {0, -1};
+        else if (keyScan == sf::Keyboard::Scan::S)
+            newMoveDir = {0, 1};
+        else if (keyScan == sf::Keyboard::Scan::A)
+            newMoveDir = {-1, 0};
+        else if (keyScan == sf::Keyboard::Scan::D)
+            newMoveDir = {1, 0};
+
+        // Allow only pure horizontal or vertical movement
+        bool isSingleAxisMove = (newMoveDir.x != 0.f) != (newMoveDir.y != 0.f);
+
+        if (isSingleAxisMove)
+            self->moveDir = newMoveDir;
+        else
+            self->moveDir = {0, 0};
+
+        self->updateSpriteSheet();
+    });
+
+    scene->onKeyReleased.subscribe([self](auto keyScan) { //
+        // Reset movement only if the released key matches the current moveDir direction
+        if ((keyScan == sf::Keyboard::Scan::W && self->moveDir == sf::Vector2f{0, -1}) ||
+            (keyScan == sf::Keyboard::Scan::S && self->moveDir == sf::Vector2f{0, 1}) ||
+            (keyScan == sf::Keyboard::Scan::A && self->moveDir == sf::Vector2f{-1, 0}) ||
+            (keyScan == sf::Keyboard::Scan::D && self->moveDir == sf::Vector2f{1, 0}))
+        {
+            self->moveDir = {0, 0};
+        }
+
+        self->updateSpriteSheet();
+    });
+}
+
+void PlayerObject::interact(const std::shared_ptr<PlayerObject> &self)
+{
+
+    for (const auto &weakInteractable : self->interactableObjectsInScene)
+    {
+        if (auto interactable = weakInteractable.lock())
+        {
+
+            if (interactable->distanceFromPlayer < 50.f) // example threshold
             {
-                if (auto interactable = weakInteractable.lock())
+                DEBUG_PRINT("Interacting with: " + interactable->getName());
+
+                interactable->interact();
+
+                if (interactable->isConverter)
                 {
+                    std::shared_ptr<ConverterObject> converter = std::dynamic_pointer_cast<ConverterObject>(interactable);
 
-                    if (interactable->distanceFromPlayer < 50.f) // example threshold
+                    if (converter)
                     {
-                        DEBUG_PRINT("Interacting with: " + interactable->getName());
+                        auto heldItem = self->getAndRemoveHeldItem();
+                        if (!heldItem)
+                            break;
 
-                        interactable->interact();
+                        converter->addToStored(heldItem.value());
+                    }
 
-                        if (interactable->isConverter)
-                        {
-                            std::shared_ptr<ConverterObject> converter = std::dynamic_pointer_cast<ConverterObject>(interactable);
+                    continue;
+                }
 
-                            if (converter)
-                            {
-                                auto heldItem = self->getAndRemoveHeldItem();
-                                if (!heldItem)
-                                    break;
-
-                                converter->addToStored(heldItem.value());
-                            }
-
-                            continue;
-                        }
-
-                        // if not converter then remove from list (item deletes itself)
-                        self->addToHeldItem(interactable->asItem());
-                        // remove from the list of interactable objects
-                        for (auto it = self->interactableObjectsInScene.begin(); it != self->interactableObjectsInScene.end(); ++it)
-                        {
-                            if (it->lock() == interactable)
-                            {
-                                self->interactableObjectsInScene.erase(it);
-                                break; // done
-                            }
-                        }
-
-                        break; // interact with one object only
+                // if not converter then remove from list (item deletes itself)
+                self->addToHeldItem(interactable->asItem());
+                // remove from the list of interactable objects
+                for (auto it = self->interactableObjectsInScene.begin(); it != self->interactableObjectsInScene.end(); ++it)
+                {
+                    if (it->lock() == interactable)
+                    {
+                        self->interactableObjectsInScene.erase(it);
+                        break; // done
                     }
                 }
+
+                break; // interact with one object only
             }
         }
-    });
+    }
 }
 
 void PlayerObject::addToHeldItem(gameStructs::Item item)
@@ -119,8 +161,6 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
     moveDir.y *= 5;
     sf::Vector2f point = playerPos + moveDir;
 
-    DEBUG_PRINT(gameUtils::vectorToString(playerPos) + " -> " + gameUtils::vectorToString(point));
-
     if (!debugPointAdded)
     {
         debugPointAdded = true;
@@ -156,30 +196,35 @@ bool PlayerObject::canMove(sf::Vector2f moveDir)
     return false;
 }
 
+void PlayerObject::updateSpriteSheet()
+{
+    // Determine direction and update sprite if changed
+    std::string newDirection;
+
+    if (moveDir.x == 0 && moveDir.y < 0)
+        newDirection = "top";
+    else if (moveDir.x == 0 && moveDir.y > 0)
+        newDirection = "bottom";
+    else if (moveDir.x < 0 && moveDir.y == 0)
+        newDirection = "left";
+    else if (moveDir.x > 0 && moveDir.y == 0)
+        newDirection = "right";
+    else
+        newDirection = "idle"; // Shouldn't happen due to early return
+
+    changeSpriteSheet("assets/player/" + newDirection + ".png");
+}
+
 void PlayerObject::update(float dt)
 {
+    AnimatedSpriteObject::update(dt);
     movement(dt);
 }
 
 void PlayerObject::movement(float dt)
 {
-
-    sf::Vector2f direction{0.f, 0.f};
-
-    if (scene->isKeyPressed(sf::Keyboard::Scan::W))
-        direction.y -= 1.f;
-    if (scene->isKeyPressed(sf::Keyboard::Scan::S))
-        direction.y += 1.f;
-    if (scene->isKeyPressed(sf::Keyboard::Scan::A))
-        direction.x -= 1.f;
-    if (scene->isKeyPressed(sf::Keyboard::Scan::D))
-        direction.x += 1.f;
-
-    if (!canMove(direction))
-    {
-        move({0.f, 0.f}, dt, 0.f);
+    if (!canMove(moveDir))
         return;
-    }
 
-    move(gameUtils::normalizeVector2f(direction), dt, 100.f);
+    move(gameUtils::normalizeVector2f(moveDir), dt, 100.f);
 }

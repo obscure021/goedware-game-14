@@ -39,20 +39,20 @@ int main()
     scene->addObject(background);
 
     // scene->addObject(animTest);
-    scene->addObject(player);
-
+    
     scene->addObject(boxA);
     scene->addObject(boxB);
-
+    
     scene->addObject(converter);
-
+    
     std::vector<sf::FloatRect> zones = gameVariables::playerCollisionZones;
-
+    
     for (size_t i = 0; i < zones.size(); i++)
     {
         auto zoneObj = std::make_shared<ZoneObject>("zone" + std::to_string(i), "assets/dummy_pixel.png", zones[i]);
         scene->addObject(zoneObj);
     }
-
+    scene->addObject(player);
+    
     scene->initalize();
 }

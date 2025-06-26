@@ -18,6 +18,9 @@ public:
     void setName(const std::string &name);
     std::string getName() const;
 
+    void setScale(float x, float y);
+    void setScale(sf::Vector2f scaleVector);
+
     void setPosition(float x, float y);
     void setPosition(sf::Vector2f positionVector);
 

@@ -28,6 +28,17 @@ std::string Object::getName() const
     return name;
 }
 
+void Object::setScale(float x, float y)
+{
+    setScale({x, y});
+}
+
+void Object::setScale(sf::Vector2f scaleVector)
+{
+    if (sprite)
+        sprite->setScale(scaleVector);
+}
+
 void Object::setPosition(sf::Vector2f positionVector)
 {
     if (sprite)

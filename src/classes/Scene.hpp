@@ -16,6 +16,7 @@ public:
     Scene(sf::Vector2u size, const std::string &title, sf::Vector2f origin = {0.f, 0.f});
 
     gameUtils::Event<sf::Keyboard::Scan> onKeyPressed;
+    gameUtils::Event<sf::Keyboard::Scan> onKeyReleased;
     const std::unordered_set<sf::Keyboard::Scan> &getHeldKeys() const;
     bool isKeyPressed(sf::Keyboard::Scan keyScan);
 

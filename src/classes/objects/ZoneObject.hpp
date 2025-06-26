@@ -7,7 +7,7 @@
 class ZoneObject : public Object
 {
 public:
-    ZoneObject(const std::string &name, std::string dummyTexture, sf::FloatRect rectangle); // seconds per frame
+    ZoneObject(const std::string &name, std::string dummyTexture, sf::FloatRect rectangle, bool showArea = false); // seconds per frame
 
     const sf::FloatRect getZone();
 
@@ -15,6 +15,7 @@ public:
     void update(float deltaTime) override;
 
 private:
+    bool showArea;
     sf::FloatRect zone;
     sf::Vector2f origin = {0.5f, 0.5f};
 };
