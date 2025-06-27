@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <random>
 
 #include "utils/Structs.hpp"
 
@@ -60,6 +61,19 @@ namespace gameUtils
             result[elem.name] += elem.numOfMoles;
         }
         return result;
+    }
+
+    inline int getRandomIntExclusive(int min, int max)
+    {
+        if (max - min <= 1)
+        {
+            throw std::invalid_argument("Invalid range: no integers exist between min and max."); // Guard clause
+        }
+
+        std::random_device rd;                                  // Non-deterministic seed
+        std::mt19937 gen(rd());                                 // Mersenne Twister RNG
+        std::uniform_int_distribution<> dist(min + 1, max - 1); // Exclude min and max
+        return dist(gen);
     }
 
     template <typename... Args>

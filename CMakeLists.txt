@@ -19,6 +19,7 @@ add_executable(main
     src/classes/objects/ConverterObject.cpp
     src/classes/objects/DebugObject.cpp
     src/classes/objects/ZoneObject.cpp
+    src/classes/objects/StarObject.cpp
     src/classes/utils/Helpers.cpp
     src/classes/utils/Structs.hpp
     src/classes/utils/Variables.cpp

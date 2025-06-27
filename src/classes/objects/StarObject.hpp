@@ -1,0 +1,26 @@
+#pragma once
+
+#include "Object.hpp"
+#include <vector>
+#include <filesystem>
+
+class StarObject : public Object
+{
+public:
+    StarObject(const std::string &name, std::string dummyTexture, sf::Vector2f screenPositionNormalized); // seconds per frame
+
+    void draw(sf::RenderWindow &window) const override;
+    void update(float deltaTime) override;
+
+private:
+    mutable sf::RectangleShape starShape;
+    sf::Vector2f screenPosition;
+    float randomPhase;
+
+    float twinkleTimer;
+    uint8_t twinkleMinAlpha;
+    uint8_t twinkleMaxAlpha;
+    std::vector<uint8_t> twinkleSteps;
+
+    float sineMapped(float t);
+};

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include "objects/StarObject.hpp"
 
 Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector2f origin)
     : window(sf::VideoMode({windowSize.x, windowSize.y}), title, sf::Style::Titlebar | sf::Style::Close), origin(origin)
@@ -17,6 +18,11 @@ Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector
 sf::RenderWindow &Scene::getWindow()
 {
     return window;
+}
+
+sf::View &Scene::getCameraView()
+{
+    return cameraView;
 }
 
 void Scene::addObject(std::shared_ptr<Object> object)
@@ -46,6 +52,20 @@ void Scene::addTemporaryObject(Object &&tempObject)
     else
     {
         DEBUG_PRINT("Rejected temporary object. Only DebugObject supported.");
+    }
+}
+
+void Scene::addStar(std::shared_ptr<StarObject> starObject)
+{
+    try
+    {
+        starObjects.push_back(starObject);
+        starObject->connectToScene(shared_from_this());
+        DEBUG_PRINT("Star named " + starObject->getName() + " succesfully.");
+    }
+    catch (const std::exception &e)
+    {
+        stop();
     }
 }
 
@@ -117,24 +137,6 @@ void Scene::processEvents()
     {
         if (event->is<sf::Event::Closed>())
             window.close();
-        else if (const auto *resized = event->getIf<sf::Event::Resized>())
-        {
-            // update the view to the new size of the window
-            sf::FloatRect visibleArea({0.f, 0.f}, sf::Vector2f(resized->size));
-            window.setView(sf::View(visibleArea));
-            onResize.fire(resized->size);
-
-            // get player pos
-            sf::Vector2f playerPos = getPlayer()->getPosition();
-            // get screen center
-            sf::Vector2f screenCenter = sf::Vector2f(resized->size.x / 2, resized->size.y / 2);
-            // move all objects to center
-            for (auto &obj : objects)
-            {
-                sf::Vector2f newPos = obj->getPosition() - (playerPos - screenCenter);
-                obj->setPosition(newPos);
-            }
-        }
         else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
         {
             heldKeys.insert(keyPressed->scancode); // add to set
@@ -157,6 +159,12 @@ void Scene::update()
     {
         obj->update(deltaTime); // Pass delta time to each object's update method
     }
+
+    for (const auto &starObj : starObjects)
+    {
+        starObj->update(deltaTime); // Pass delta time to each object's update method
+    }
+    
 
     for (auto &tempObj : tempDebugObjects)
     {
@@ -183,6 +191,13 @@ void Scene::update()
 void Scene::render()
 {
     window.clear();
+
+    window.setView(starView);
+    for (const auto &obj : starObjects)
+    {
+        obj->draw(window);
+    }
+
     window.setView(cameraView);
 
     for (const auto &obj : objects)
@@ -235,5 +250,5 @@ const std::vector<std::shared_ptr<Object>> &Scene::getAllObjects() const
 
 sf::Vector2f Scene::getOrigin()
 {
-    return origin + localToWorldCorrection;
+    return origin;
 }

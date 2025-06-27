@@ -2,6 +2,7 @@
 #define OBJECT_HPP
 
 #include "utils/Helpers.cpp"
+#include "utils/Variables.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <optional>

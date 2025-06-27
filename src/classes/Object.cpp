@@ -103,6 +103,10 @@ void Object::destroySelf()
 
 void Object::draw(sf::RenderWindow &window) const
 {
+    if (!scene) return;
+    
+    window.setView(scene->getCameraView());
+
     if (sprite)
         window.draw(*sprite);
 }

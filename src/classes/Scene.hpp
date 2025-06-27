@@ -8,6 +8,7 @@
 
 #include "Object.hpp"
 #include "objects/PlayerObject.hpp"
+#include "objects/StarObject.hpp"
 #include "utils/Helpers.cpp"
 
 class Scene : public std::enable_shared_from_this<Scene>
@@ -22,9 +23,11 @@ public:
 
     gameUtils::Event<sf::Vector2u> onResize;
     sf::RenderWindow &getWindow();
+    sf::View &getCameraView();
 
     void addObject(std::shared_ptr<Object> object);
     void addTemporaryObject(Object &&tempObject);
+    void addStar(std::shared_ptr<StarObject> starObject);
     void clearTemporaryObjects();
     void removeObject(std::shared_ptr<Object> object);
     const std::shared_ptr<Object> &getObjectWithName(std::string name) const;
@@ -47,7 +50,9 @@ private:
 
     sf::RenderWindow window;
     sf::View cameraView;
+    sf::View starView;
     std::vector<std::shared_ptr<Object>> objects;
+    std::vector<std::shared_ptr<StarObject>> starObjects;
     std::vector<DebugObject> tempDebugObjects; // for value-based debug objects only
 
     std::unordered_set<sf::Keyboard::Scan> heldKeys;
@@ -55,7 +60,6 @@ private:
     sf::Clock deltaClock; // Clock to measure time between frames
     const sf::Vector2f origin;
 
-    sf::Vector2f localToWorldCorrection;
 };
 
 #endif

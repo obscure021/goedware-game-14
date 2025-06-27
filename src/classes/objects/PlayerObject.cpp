@@ -6,7 +6,7 @@
 #include "objects/InteractableObject.hpp"
 
 PlayerObject::PlayerObject()
-    : AnimatedSpriteObject("Player", "assets/player/idle.png", {150, -60})
+    : AnimatedSpriteObject("Player", "assets/player/idle.png", {545, 795})
 {
     setScale({2, 2});
     setAnchor({8, 8});
@@ -14,9 +14,6 @@ PlayerObject::PlayerObject()
 
 void PlayerObject::afterSceneInit()
 {
-    sf::Vector2u windowSize = scene->getWindow().getSize();
-    setPosition(static_cast<float>(windowSize.x) / 2.f, static_cast<float>(windowSize.y) / 2.f);
-
     // setup interactable objects
     for (const auto &obj : scene->getAllObjects())
     {
@@ -220,8 +217,6 @@ void PlayerObject::update(float dt)
 {
     AnimatedSpriteObject::update(dt);
     movement(dt);
-
-    DEBUG_PRINT(gameUtils::vectorToString(getPosition() - scene->getOrigin()));
 }
 
 void PlayerObject::movement(float dt)
