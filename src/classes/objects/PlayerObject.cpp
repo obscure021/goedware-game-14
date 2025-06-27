@@ -229,5 +229,5 @@ void PlayerObject::movement(float dt)
     if (!canMove(moveDir))
         return;
 
-    move(gameUtils::normalizeVector2f(moveDir), dt, 100.f);
+    move(gameUtils::normalizeVector2f(moveDir), dt, 125.f);
 }

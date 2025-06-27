@@ -2,9 +2,9 @@
 #include "ZoneObject.hpp"
 
 ZoneObject::ZoneObject(const std::string &name, std::string dummyTexture, sf::FloatRect zone, bool showArea)
-    : Object(name, dummyTexture, zone.position), zone(zone), showArea(false)
+    : Object(name, dummyTexture, zone.position), zone(zone)
 {
-    // if (!showArea) return;
+    return;
 
     // Ensure sprite exists
     if (!sprite.has_value())
@@ -36,7 +36,7 @@ const sf::FloatRect ZoneObject::getZone()
 }
 void ZoneObject::draw(sf::RenderWindow &window) const
 {
-    // if (!showArea) return;
+    return;
 
     if (sprite.has_value())
         window.draw(*sprite);

@@ -15,7 +15,6 @@ public:
     void update(float deltaTime) override;
 
 private:
-    bool showArea;
     sf::FloatRect zone;
     sf::Vector2f origin = {0.f, 0.f};
 };
