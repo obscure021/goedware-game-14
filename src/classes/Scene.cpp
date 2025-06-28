@@ -11,6 +11,8 @@ Scene::Scene(sf::Vector2u windowSize, const std::string &title, const sf::Vector
     cameraView.setCenter(sf::Vector2f(windowSize.x / 2, windowSize.y / 2));
     cameraView.setSize(window.getDefaultView().getSize());
 
+    starView = cameraView;
+
     window.setFramerateLimit(60);
     window.setKeyRepeatEnabled(false);
 }
@@ -126,8 +128,8 @@ void Scene::initalize()
         // std::cout << "FPS: " << fps << std::endl;
 
         processEvents();
-        update();
         render();
+        update();
     }
 }
 
@@ -155,36 +157,19 @@ void Scene::update()
     // OBJECTS UPDATE
     float deltaTime = getDeltaTime(); // Get time between frames
 
+    // Update all objects
     for (const auto &obj : objects)
-    {
-        obj->update(deltaTime); // Pass delta time to each object's update method
-    }
-
+        obj->update(deltaTime);
     for (const auto &starObj : starObjects)
-    {
-        starObj->update(deltaTime); // Pass delta time to each object's update method
-    }
-    
-
+        starObj->update(deltaTime);
     for (auto &tempObj : tempDebugObjects)
-    {
         tempObj.update(deltaTime);
-    }
 
-    // LOGIC
-    // player movement (move the entire scene instead of player)
+    // Update views
     auto player = getPlayer();
     if (player)
     {
         cameraView.setCenter(player->getPosition());
-        // for (const auto &obj : objects)
-        // {
-        //     if (obj->getName() == "Player")
-        //         continue;
-
-        //     obj->move(movementVector);
-        //     localToWorldCorrection= movementVector;
-        // }
     }
 }
 

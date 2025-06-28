@@ -217,6 +217,8 @@ void PlayerObject::update(float dt)
 {
     AnimatedSpriteObject::update(dt);
     movement(dt);
+
+    DEBUG_PRINT(gameUtils::vectorToString(getPosition()));
 }
 
 void PlayerObject::movement(float dt)

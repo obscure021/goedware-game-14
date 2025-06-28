@@ -39,10 +39,6 @@ StarObject::StarObject(const std::string &name, std::string dummyTexture, sf::Ve
 
 void StarObject::draw(sf::RenderWindow &window) const
 {
-    // Switch to screen-space (UI) view
-    window.setView(window.getDefaultView());
-
-    // Draw the star shape in screen space
     window.draw(starShape);
 }
 
@@ -50,9 +46,9 @@ void StarObject::update(float deltaTime)
 {
     twinkleTimer += deltaTime;
 
-    float mapped = sineMapped(twinkleTimer * 4.f);
+    float mapped = sineMapped(twinkleTimer * 2.f * static_cast<float>(M_PI) * twinklesPerSecond);
+    // Multiply time by 2πf to match sine wave cycles per second
 
-    // Normalize mapped value back to [0, 1] range
     float normalized = (mapped - twinkleMinAlpha) / (twinkleMaxAlpha - twinkleMinAlpha);
 
     std::size_t index = static_cast<std::size_t>(normalized * (twinkleSteps.size() - 1));
@@ -64,6 +60,7 @@ void StarObject::update(float deltaTime)
     color.a = alpha;
     starShape.setFillColor(color);
 }
+
 
 float StarObject::sineMapped(float t)
 {

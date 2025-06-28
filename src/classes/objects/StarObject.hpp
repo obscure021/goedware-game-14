@@ -2,6 +2,7 @@
 
 #include "Object.hpp"
 #include <vector>
+#include <math.h>
 #include <filesystem>
 
 class StarObject : public Object
@@ -18,6 +19,7 @@ private:
     float randomPhase;
 
     float twinkleTimer;
+    float twinklesPerSecond = 1.f/5.f; // twinkle in 5 sec
     uint8_t twinkleMinAlpha;
     uint8_t twinkleMaxAlpha;
     std::vector<uint8_t> twinkleSteps;
