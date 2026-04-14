@@ -1,44 +1,81 @@
 cmake_minimum_required(VERSION 3.28)
-project(CMakeSFML3 LANGUAGES CXX)
+project(project-name LANGUAGES CXX)
+# SET PROJECT NAME HERE
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Let CMake find SFML 3 from system paths (e.g., Homebrew-installed)
 find_package(SFML 3 COMPONENTS Window Graphics Audio System REQUIRED)
 
-
-add_executable(main
-    src/main.cpp
-    src/classes/Scene.cpp
-    src/classes/Object.cpp
-    src/classes/objects/PlayerObject.cpp
-    src/classes/objects/InteractableObject.cpp
-    src/classes/objects/AnimatedSpriteObject.cpp
-    src/classes/objects/ConverterObject.cpp
-    src/classes/objects/DebugObject.cpp
-    src/classes/objects/ZoneObject.cpp
-    src/classes/objects/StarObject.cpp
-    src/classes/utils/Helpers.cpp
-    src/classes/utils/Structs.hpp
-    src/classes/utils/Variables.cpp
-    ${SOURCES}
+# get all files in src directory
+file(GLOB_RECURSE FILES_FOLDERS
+    LIST_DIRECTORIES true
+    ${CMAKE_SOURCE_DIR}/src/*
 )
 
+# loop through all files and seperate files from directories
+set(FILES "") # list
+set(FOLDERS "") # list
+foreach(item IN LISTS FILES_FOLDERS)
+    # only include cpp and hpp files in files list
+    string(REGEX MATCH "\\.cpp$" isCPPFile "${item}")
+    string(REGEX MATCH "\\.hpp$" isHPPFile "${item}")
+    if(IS_DIRECTORY "${item}")
+        list(APPEND FOLDERS "${item}")
+    elseif(isCPPFile)
+        list(APPEND FILES "${item}")
+    elseif(isHPPFile)
+        list(APPEND FILES "${item}")
+    endif()
+endforeach()
 
-target_include_directories(main PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/classes
-    )
+# log all detected files in console
+message(STATUS "Files Detected:")
+foreach(f IN LISTS FILES)
+    message(STATUS "${f}")
+endforeach()
 
-# Link to SFML 3 imported targets
-target_link_libraries(main PRIVATE
+# log all detected folders in console
+message(STATUS "Folders Detected:")
+foreach(dir IN LISTS FOLDERS)
+    message(STATUS "${dir}")
+endforeach()
+
+# link all files to exec
+add_executable(
+    main
+    ${FILES}
+)
+
+# inlcude all directories
+# suppose a header file in src/utils/Helpers.hpp
+# since all directories are included; you can run
+# #include "Helpers.hpp" instead of #include "utils/Helpers.hpp"; utils/Helpers.hpp since src firectory has to be included
+target_include_directories(
+    main PRIVATE
+    ${FOLDERS}
+    "${CMAKE_SOURCE_DIR}/external/included"
+)
+# files in external/included are also included to allow downloading libraries and using them
+add_custom_target(copy_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/assets"
+    "${CMAKE_CURRENT_BINARY_DIR}/assets"
+    COMMENT "Copying asset files..."
+)
+
+add_dependencies(main copy_assets)
+
+# CHANGE: link installed libraries here
+target_link_libraries(
+    main PRIVATE
     SFML::Window
     SFML::Graphics
     SFML::Audio
     SFML::System
 )
+# END CHANGE
+
 
 add_custom_command(
     TARGET main POST_BUILD
